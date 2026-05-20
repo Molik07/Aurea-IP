@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # PostgreSQL (Used by Prisma for Users/Orders)
+  postgres:
+    image: postgres:16-alpine
+    container_name: makeup-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: makeup_store
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # MongoDB (Used by Mongoose for Products)
+  mongodb:
+    image: mongo:7.0
+    container_name: makeup-mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+
+  # Redis (Used for Caching/Sessions)
+  redis:
+    image: redis:7.2-alpine
+    container_name: makeup-redis
+    restart: always
+    ports:
+      - '6379:6379'
+
+volumes:
+  postgres_data:
+  mongodb_data:

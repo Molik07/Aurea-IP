@@ -1,0 +1,428 @@
+import { useMemo, useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { bestsellerIds, newArrivalIds } from '../data/mockProducts'
+import useProducts from '../hooks/useProducts'
+import useSettings from '../hooks/useSettings'
+import HorizontalScroll from '../components/ui/HorizontalScroll'
+import ProductCard from '../components/ui/ProductCard'
+import TrustBar from '../components/ui/TrustBar'
+
+const concerns = [
+  { label: 'Acne', icon: '✦', path: '/products?concern=Acne' },
+  { label: 'Hydration', icon: '◇', path: '/products?concern=Hydration' },
+  { label: 'Brightening', icon: '✧', path: '/products?concern=Brightening' },
+  { label: 'Anti-Aging', icon: '◈', path: '/products?concern=Anti-Aging' },
+  { label: 'SPF', icon: '☀', path: '/products?concern=SPF' },
+]
+
+const adSlides = [
+  {
+    id: 1,
+    image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&auto=format&fit=crop&q=80',
+    tagline: 'SUMMER RADIANCE REEL',
+    title: 'Flat 20% Off on SPF Serums',
+    desc: 'Protect and glow with our invisible, weightless physical sunscreen formulas. Use code GLOW20 at checkout.',
+    cta: 'Explore SPF',
+    path: '/products?concern=SPF',
+  },
+  {
+    id: 2,
+    image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=1200&auto=format&fit=crop&q=80',
+    tagline: 'DERMATOLOGICAL EXCELLENCE',
+    title: 'The Ceramide Barrier Repair',
+    desc: 'Instantly soothe redness and strengthen your outer lipid barrier with 5 essential skin-identical ceramides.',
+    cta: 'Shop Hydration',
+    path: '/products?concern=Hydration',
+  },
+  {
+    id: 3,
+    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=1200&auto=format&fit=crop&q=80',
+    tagline: 'COMPLIMENTARY GIFT',
+    title: 'Pure Obsidian Face Roller',
+    desc: 'Receive a complimentary premium hand-sculpted face roller on all pre-paid orders above ₹1,999.',
+    cta: 'Claim Offer',
+    path: '/products',
+  },
+]
+
+const bundles = [
+  { name: 'Morning Glow Kit', desc: 'Cleanser · Vitamin C · SPF 50+', price: '₹2,299', original: '₹2,899', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80' },
+  { name: 'Night Repair Set', desc: 'Toner · Retinol Cream · Ceramide Serum', price: '₹2,999', original: '₹3,697', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&auto=format&fit=crop&q=80' },
+  { name: 'SPF Essentials', desc: 'Cleanser · Niacinamide · Invisible SPF', price: '₹1,799', original: '₹2,247', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop&q=80' },
+]
+
+export default function Home() {
+  const { products } = useProducts()
+  const { settings } = useSettings()
+  
+  const bestsellers = useMemo(() => {
+    const list = bestsellerIds.map((id) => products.find((p) => p.id === id)).filter(Boolean)
+    return list.length > 0 ? list : products.slice(0, 6)
+  }, [products])
+
+  const newArrivals = useMemo(() => {
+    const list = newArrivalIds.map((id) => products.find((p) => p.id === id)).filter(Boolean)
+    return list.length > 0 ? list : (products.slice(6, 12).length > 0 ? products.slice(6, 12) : products.slice(0, 6))
+  }, [products])
+
+  const videoStart = 45 // Start playback right from the high-energy middle section
+
+  const [currentAdSlide, setCurrentAdSlide] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentAdSlide((prev) => (prev + 1) % adSlides.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <main>
+      {/* Hero */}
+      <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 24px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '48px',
+          alignItems: 'center',
+          minHeight: '520px',
+        }}
+          className="hero-grid"
+        >
+          <div>
+            <p style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '16px' }}>
+              Science-Backed Skincare
+            </p>
+            <h1 style={{
+              fontFamily: 'Playfair Display, serif',
+              fontSize: 'clamp(36px, 5vw, 56px)',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.15,
+              color: 'var(--text)',
+              marginBottom: '20px',
+            }}>
+              Radiance,<br />Redefined.
+            </h1>
+            <p style={{ fontSize: '16px', color: 'var(--text-mid)', lineHeight: 1.7, maxWidth: '400px', marginBottom: '32px' }}>
+              Formulated by dermatologists. Loved by thousands. Skincare that actually works for Indian skin.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <Link to="/products" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '44px',
+                padding: '0 28px',
+                backgroundColor: 'var(--accent)',
+                color: 'var(--white)',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 500,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                textDecoration: 'none',
+              }}>
+                Shop Now
+              </Link>
+              <Link to="/quiz" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '44px',
+                padding: '0 28px',
+                backgroundColor: 'transparent',
+                color: 'var(--accent)',
+                border: '1px solid var(--accent)',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                fontWeight: 500,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                textDecoration: 'none',
+              }}>
+                Take the Quiz
+              </Link>
+            </div>
+          </div>
+
+          {/* IMAGE SLOT */}
+          <div style={{
+            aspectRatio: '4 / 5',
+            background: '#e8e4df',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden'
+          }}
+            className="hero-image"
+          >
+            {settings.heroImage ? (
+              <img src={settings.heroImage.includes('/upload/') ? settings.heroImage.replace('/upload/', '/upload/w_1000,q_auto,f_auto/') : settings.heroImage} alt="Hero Banner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <span style={{ fontSize: '11px', letterSpacing: '0.08em', color: '#bbb', textTransform: 'uppercase' }}>Image Slot</span>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* YouTube Banner */}
+      <div style={{ position: 'relative', width: '100%', overflow: 'hidden', height: '416px', backgroundColor: '#111' }}>
+        <div style={{ opacity: 0, animation: 'fadeIn 1s ease 1.5s forwards' }}>
+          <iframe
+            src={`https://www.youtube.com/embed/4KtHgUEKBts?autoplay=1&mute=1&loop=1&playlist=4KtHgUEKBts&controls=0&showinfo=0&rel=0&modestbranding=1&start=${videoStart}&playsinline=1&disablekb=1&fs=0&iv_load_policy=3`}
+            allow="autoplay; fullscreen"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '177.78vh',
+              minWidth: '100%',
+              height: '56.25vw',
+              minHeight: '100%',
+              border: 'none',
+              pointerEvents: 'none',
+            }}
+            title="Aurea brand video"
+          />
+        </div>
+        <style>{`
+          @keyframes fadeIn {
+            to { opacity: 1; }
+          }
+        `}</style>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.2)',
+          zIndex: 10,
+        }} />
+      </div>
+
+      {/* Bestsellers */}
+      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '72px', paddingBottom: '72px' }}>
+        <HorizontalScroll title="Bestsellers">
+          {bestsellers.map((p) => (
+            <div key={p.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </HorizontalScroll>
+      </section>
+
+      {/* Shop by Concern */}
+      <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '36px', textAlign: 'center' }}>
+            Shop by Concern
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap: '16px',
+          }}
+            className="concern-grid"
+          >
+            {concerns.map((c) => (
+              <Link
+                key={c.label}
+                to={c.path}
+                style={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '28px 16px',
+                  border: '1px solid var(--border)',
+                  transition: 'background 0.2s, border-color 0.2s',
+                  backgroundColor: 'var(--bg)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-alt)'
+                  e.currentTarget.style.borderColor = 'var(--text-light)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--bg)'
+                  e.currentTarget.style.borderColor = 'var(--border)'
+                }}
+              >
+                <span style={{ fontSize: '28px', lineHeight: 1 }}>{c.icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{c.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+        <style>{`
+          @media (max-width: 768px) {
+            .concern-grid { grid-template-columns: repeat(3, 1fr) !important; }
+            .hero-grid { grid-template-columns: 1fr !important; }
+            .hero-image { display: none !important; }
+          }
+        `}</style>
+      </section>
+
+      {/* New Arrivals */}
+      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '72px', paddingBottom: '72px' }}>
+        <HorizontalScroll title="New Arrivals">
+          {newArrivals.map((p) => (
+            <div key={p.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
+              <ProductCard product={p} />
+            </div>
+          ))}
+        </HorizontalScroll>
+      </section>
+
+      {/* DIGITAL CAROUSEL AD SLOT LOOP (PURE TYPOGRAPHIC BILLBOARD) */}
+      <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            minHeight: '260px',
+            borderRadius: '2px',
+            overflow: 'hidden',
+            backgroundColor: '#111',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+          }}>
+            {/* Absolute container for smooth overlay crossfading */}
+            {adSlides.map((slide, idx) => {
+              const isActive = idx === currentAdSlide
+              return (
+                <div
+                  key={slide.id}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: isActive ? 1 : 0,
+                    transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                    pointerEvents: isActive ? 'auto' : 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '40px 24px',
+                    backgroundColor: '#111',
+                    color: '#fff',
+                  }}
+                >
+                  <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
+                    {slide.tagline}
+                  </span>
+                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 500, marginBottom: '16px', lineHeight: 1.2, maxWidth: '800px' }}>
+                    {slide.title}
+                  </h3>
+                  <p style={{ fontSize: '15px', color: '#ccc', lineHeight: 1.6, marginBottom: '28px', maxWidth: '600px' }}>
+                    {slide.desc}
+                  </p>
+                  <div>
+                    <Link to={slide.path} style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: '42px',
+                      padding: '0 32px',
+                      backgroundColor: 'var(--white)',
+                      color: '#111',
+                      fontFamily: 'DM Sans, sans-serif',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      textDecoration: 'none',
+                      transition: 'background 0.2s, transform 0.2s',
+                    }}>
+                      {slide.cta} →
+                    </Link>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Loop progress indicators / click handles centered at bottom */}
+            <div style={{ position: 'absolute', bottom: '20px', display: 'flex', gap: '8px', zIndex: 10 }}>
+              {adSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentAdSlide(idx)}
+                  style={{
+                    width: '40px',
+                    height: '3px',
+                    padding: 0,
+                    border: 'none',
+                    backgroundColor: idx === currentAdSlide ? 'var(--accent)' : 'rgba(255,255,255,0.25)',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s',
+                  }}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Bundles & Kits */}
+      <section style={{ backgroundColor: 'var(--bg-alt)' }} className="section-pad">
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '36px' }}>
+            Bundles &amp; Kits
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="bundles-grid">
+            {bundles.map((b) => (
+              <div key={b.name} style={{ border: '1px solid var(--border)', backgroundColor: 'var(--bg)' }}>
+                {/* IMAGE SLOT */}
+                <div style={{ aspectRatio: '4 / 3', background: '#e8e4df', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {b.image ? (
+                    <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Image Slot</span>
+                  )}
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', marginBottom: '6px' }}>{b.name}</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--text-light)', marginBottom: '12px' }}>{b.desc}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 600 }}>{b.price}</span>
+                    <span style={{ fontSize: '13px', color: 'var(--text-light)', textDecoration: 'line-through' }}>{b.original}</span>
+                  </div>
+                  <Link to="/products" style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '40px',
+                    padding: '0 20px',
+                    backgroundColor: 'var(--accent)',
+                    color: 'var(--white)',
+                    fontFamily: 'DM Sans, sans-serif',
+                    fontSize: '12px',
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    textDecoration: 'none',
+                  }}>
+                    Shop Kit
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width: 768px) { .bundles-grid { grid-template-columns: 1fr !important; } }`}</style>
+      </section>
+
+      {/* Trust Bar */}
+      <section style={{ backgroundColor: 'var(--bg)' }}>
+        <TrustBar />
+      </section>
+    </main>
+  )
+}
