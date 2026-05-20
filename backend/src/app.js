@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { NODE_ENV, FRONTEND_URL } from './config/index.js';
 import { errorHandler } from './middlewares/error.middleware.js';
@@ -8,6 +9,7 @@ import cartRoutes from './routes/cart.routes.js';
 import wishlistRoutes from './routes/wishlist.routes.js';
 import productRoutes from './routes/product.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 const app = express();
 
@@ -27,6 +29,7 @@ app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
 // ─── Body Parsers ─────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
@@ -34,6 +37,7 @@ app.get('/health', (_req, res) => {
 });
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
+app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/products', productRoutes);
