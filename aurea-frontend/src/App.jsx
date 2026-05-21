@@ -4,6 +4,7 @@ import useCart from './hooks/useCart'
 import useWishlist from './hooks/useWishlist'
 import useProducts from './hooks/useProducts'
 import useSettings from './hooks/useSettings'
+import useAuth from './hooks/useAuth'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import AnnouncementBar from './components/layout/AnnouncementBar'
@@ -13,6 +14,7 @@ import ProductListing from './pages/ProductListing'
 import ProductDetail from './pages/ProductDetail'
 import Checkout from './pages/Checkout'
 import Account from './pages/Account'
+import Auth from './pages/Auth'
 import SkinQuiz from './pages/SkinQuiz'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts from './pages/admin/AdminProducts'
@@ -32,13 +34,15 @@ export default function App() {
   const initWishlist = useWishlist((state) => state.initWishlist)
   const initProducts = useProducts((state) => state.initProducts)
   const initSettings = useSettings((state) => state.initSettings)
+  const checkAuth = useAuth((state) => state.checkAuth)
 
   useEffect(() => {
+    checkAuth()
     initCart()
     initWishlist()
     initProducts()
     initSettings()
-  }, [initCart, initWishlist, initProducts, initSettings])
+  }, [checkAuth, initCart, initWishlist, initProducts, initSettings])
 
   return (
     <>
@@ -51,6 +55,7 @@ export default function App() {
         <Route path="/products" element={<ProductListing />} />
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/account" element={<Account />} />
         <Route path="/quiz" element={<SkinQuiz />} />
         <Route path="/admin" element={<AdminDashboard />} />

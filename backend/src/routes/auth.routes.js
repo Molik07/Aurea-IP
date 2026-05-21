@@ -7,6 +7,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { isAuthenticated } from '../middlewares/auth.middleware.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../lib/jwt.js';
+import { admin } from '../lib/firebase.js';
 
 const router = Router();
 
@@ -23,6 +24,15 @@ const registerSchema = z.object({
     name: z.string().min(2, 'Name is required'),
     email: z.string().email('Invalid email address'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
+    phoneNumber: z.string().optional(),
+    firebaseIdToken: z.string().optional(),
+  }).refine((data) => {
+    // If phone number is provided, a Firebase ID token MUST be provided to verify it
+    if (data.phoneNumber && !data.firebaseIdToken) return false;
+    return true;
+  }, {
+    message: "Firebase ID token is required if phone number is provided",
+    path: ["firebaseIdToken"]
   }),
 });
 
@@ -37,11 +47,29 @@ const loginSchema = z.object({
 
 // POST /api/auth/register
 router.post('/register', validate(registerSchema), asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phoneNumber, firebaseIdToken } = req.body;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     throw new ApiError(400, 'User with this email already exists');
+  }
+
+  // Verify Phone Number with Firebase if provided
+  let verifiedPhoneNumber = null;
+  if (phoneNumber && firebaseIdToken) {
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(firebaseIdToken);
+      
+      // Ensure the token's phone number matches the one submitted
+      if (decodedToken.phone_number !== phoneNumber) {
+        throw new ApiError(400, 'Phone number mismatch with Firebase token');
+      }
+      
+      verifiedPhoneNumber = decodedToken.phone_number;
+    } catch (error) {
+      console.error('[Firebase] Token Verification Error:', error);
+      throw new ApiError(401, 'Invalid or expired Firebase ID token');
+    }
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -51,6 +79,7 @@ router.post('/register', validate(registerSchema), asyncHandler(async (req, res)
       name,
       email,
       password: hashedPassword,
+      phoneNumber: verifiedPhoneNumber,
     },
   });
 

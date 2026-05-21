@@ -12,6 +12,7 @@ model User {
   email         String         @unique
   password      String?
   name          String?
+  phoneNumber   String?        @unique
   role          String         @default("customer")
   googleId      String?        @unique
   addresses     Address[]

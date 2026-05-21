@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useProducts from '../hooks/useProducts'
 import ProductCard from '../components/ui/ProductCard'
 import useWishlist from '../hooks/useWishlist'
 import ProgressBar from '../components/ui/ProgressBar'
+import useAuth from '../hooks/useAuth'
 
 const TABS = ['Overview', 'Orders', 'Addresses', 'Wishlist', 'Loyalty Points']
 
@@ -24,6 +25,8 @@ const STATUS_COLOR = { Processing: '#f59e0b', Shipped: '#3b82f6', Delivered: '#2
 export default function Account() {
   const [activeTab, setActiveTab] = useState('Overview')
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAuthenticated, isLoading } = useAuth()
   const { items: wishlistIds } = useWishlist()
   const { products } = useProducts()
   const wishlistProducts = products.filter((p) => wishlistIds.includes(p.id))
@@ -43,6 +46,16 @@ export default function Account() {
     textAlign: 'left', color: active ? 'var(--text)' : 'var(--text-mid)', fontWeight: active ? 600 : 400,
     fontFamily: 'DM Sans, sans-serif', borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent', transition: 'all 0.15s',
   })
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/auth', { state: { from: location }, replace: true })
+    }
+  }, [isLoading, isAuthenticated, navigate, location])
+
+  if (isLoading || !isAuthenticated) {
+    return <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>
+  }
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
