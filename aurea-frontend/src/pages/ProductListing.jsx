@@ -1,9 +1,6 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import useProducts from '../hooks/useProducts'
 import ProductCard from '../components/ui/ProductCard'
-
-const CATEGORIES = ['Cleanser', 'Moisturizer', 'Serum', 'Sunscreen', 'Toner', 'Mask']
 const SKIN_TYPES = ['Oily', 'Dry', 'Combination', 'Sensitive', 'Normal']
 const CONCERNS = ['Acne', 'Hydration', 'Brightening', 'Anti-Aging', 'SPF']
 const SORT_OPTIONS = [
@@ -14,47 +11,79 @@ const SORT_OPTIONS = [
 ]
 
 export default function ProductListing() {
-  const [searchParams] = useSearchParams()
-  const [categories, setCategories] = useState(() => {
+  const [selectedCategories, setSelectedCategories] = useState(() => {
     const c = searchParams.get('category')
     return c ? [c] : []
   })
+  const [dbCategories, setDbCategories] = useState([])
   const [skinTypes, setSkinTypes] = useState([])
   const [concerns, setConcerns] = useState(() => {
     const c = searchParams.get('concern')
     return c ? [c] : []
   })
-  const { products } = useProducts()
+  const [products, setProducts] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
   const [sort, setSort] = useState('newest')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '')
 
   const toggle = (arr, setArr, val) => {
     setArr((prev) => prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val])
+    setPage(1) // Reset to page 1 on filter change
   }
 
-  const filtered = useMemo(() => {
-    let list = [...products]
-    if (searchQuery) {
-      list = list.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.brand.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Fetch from server when filters change
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true)
+      try {
+        const params = new URLSearchParams();
+        if (searchQuery) params.append('search', searchQuery);
+        if (selectedCategories.length) params.append('category', selectedCategories.join(','));
+        if (skinTypes.length) params.append('skinTypes', skinTypes.join(','));
+        if (concerns.length) params.append('concerns', concerns.join(','));
+        if (sort) params.append('sort', sort);
+        params.append('page', page);
+        params.append('limit', 12);
+
+        const [prodRes, catRes] = await Promise.all([
+          fetch(`http://localhost:5000/api/products?${params.toString()}`),
+          fetch(`http://localhost:5000/api/categories`)
+        ]);
+
+        if (prodRes.ok) {
+          const data = await prodRes.json();
+          setProducts(data.products || []);
+          setTotalPages(data.pagination?.totalPages || 1);
+        }
+        
+        if (catRes.ok) {
+          const cats = await catRes.json();
+          setDbCategories(cats.map(c => c.name));
+        }
+      } catch (err) {
+        console.error('Failed to fetch products', err);
+      } finally {
+        setIsLoading(false)
+      }
     }
-    if (categories.length) list = list.filter((p) => categories.includes(p.category))
-    if (skinTypes.length) list = list.filter((p) => p.skinTypes.some((s) => skinTypes.includes(s)))
-    if (concerns.length) list = list.filter((p) => p.concerns.some((c) => concerns.includes(c)))
-    if (sort === 'price-asc') list.sort((a, b) => (a.discountPrice || a.price) - (b.discountPrice || b.price))
-    if (sort === 'price-desc') list.sort((a, b) => (b.discountPrice || b.price) - (a.discountPrice || a.price))
-    if (sort === 'rating') list.sort((a, b) => b.rating - a.rating)
-    return list
-  }, [categories, skinTypes, concerns, sort, searchQuery, products])
+    
+    // Slight debounce for typing search queries
+    const timeout = setTimeout(fetchProducts, 300)
+    return () => clearTimeout(timeout)
+  }, [searchQuery, selectedCategories, skinTypes, concerns, sort, page])
 
   const clearAll = () => {
-    setCategories([])
+    setSelectedCategories([])
     setSkinTypes([])
     setConcerns([])
     setSearchQuery('')
+    setPage(1)
   }
 
-  const hasFilters = categories.length || skinTypes.length || concerns.length || searchQuery.length > 0
+  const hasFilters = selectedCategories.length || skinTypes.length || concerns.length || searchQuery.length > 0
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -73,7 +102,8 @@ export default function ProductListing() {
           {/* Sidebar (desktop) */}
           <aside style={{ width: '220px', flexShrink: 0 }} className="plp-sidebar">
             <FilterPanel
-              categories={categories} setCategories={setCategories}
+              categories={dbCategories}
+              selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}
               skinTypes={skinTypes} setSkinTypes={setSkinTypes}
               concerns={concerns} setConcerns={setConcerns}
               toggle={toggle} clearAll={clearAll} hasFilters={hasFilters}
@@ -91,7 +121,7 @@ export default function ProductListing() {
                   style={{ display: 'none', alignItems: 'center', gap: '6px', height: '36px', padding: '0 14px', border: '1px solid var(--border)', background: 'none', fontSize: '13px', cursor: 'pointer' }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="4" y1="6" x2="20" y2="6" /><line x1="8" y1="12" x2="16" y2="12" /><line x1="12" y1="18" x2="12" y2="18" /></svg>
-                  Filters {hasFilters ? `(${+!!categories.length + +!!skinTypes.length + +!!concerns.length})` : ''}
+                  Filters {hasFilters ? `(${+!!selectedCategories.length + +!!skinTypes.length + +!!concerns.length})` : ''}
                 </button>
                 <input 
                   type="text" 
@@ -100,7 +130,9 @@ export default function ProductListing() {
                   placeholder="Search products..." 
                   style={{ height: '36px', padding: '0 14px', border: '1px solid var(--border)', background: 'var(--bg)', fontFamily: 'DM Sans, sans-serif', fontSize: '14px', outline: 'none', width: '100%', maxWidth: '280px' }} 
                 />
-                <p style={{ fontSize: '14px', color: 'var(--text-light)', display: 'none' }} className="desktop-count">Showing {filtered.length} products</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-light)', display: 'none' }} className="desktop-count">
+                  {isLoading ? 'Loading...' : `Page ${page} of ${totalPages}`}
+                </p>
               </div>
               <select
                 value={sort}
@@ -112,25 +144,42 @@ export default function ProductListing() {
             </div>
 
             {/* Grid */}
-            {filtered.length === 0 ? (
+            {isLoading ? (
+              <div style={{ padding: '80px 0', textAlign: 'center', color: 'var(--text-mid)' }}>Loading products...</div>
+            ) : products.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-mid)' }}>
                 <p style={{ fontSize: '16px', marginBottom: '12px' }}>No products match your filters.</p>
                 <button onClick={clearAll} style={{ fontSize: '13px', color: 'var(--text)', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer' }}>Clear all filters</button>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="product-grid">
-                {filtered.map((p, i) => (
-                  <>
-                    {i === 6 && (
-                      <div key="ad" style={{ gridColumn: '1 / -1' }}>
-                        {/* AD SLOT */}
-                        <div className="ad-slot">AD SLOT</div>
-                      </div>
-                    )}
-                    <ProductCard key={p.id} product={p} />
-                  </>
-                ))}
-              </div>
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="product-grid">
+                  {products.map((p, i) => (
+                    <ProductCard key={p.id || i} product={p} />
+                  ))}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px', marginTop: '60px' }}>
+                    <button 
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      style={{ padding: '8px 16px', border: '1px solid var(--border)', background: 'var(--bg)', borderRadius: '6px', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}
+                    >
+                      Previous
+                    </button>
+                    <span style={{ fontSize: '14px', color: 'var(--text-mid)' }}>Page {page} of {totalPages}</span>
+                    <button 
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      style={{ padding: '8px 16px', border: '1px solid var(--border)', background: 'var(--bg)', borderRadius: '6px', cursor: page === totalPages ? 'not-allowed' : 'pointer', opacity: page === totalPages ? 0.5 : 1 }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -146,7 +195,8 @@ export default function ProductListing() {
               <button onClick={() => setDrawerOpen(false)} style={{ fontSize: '22px', background: 'none', border: 'none', cursor: 'pointer' }}>×</button>
             </div>
             <FilterPanel
-              categories={categories} setCategories={setCategories}
+              categories={dbCategories}
+              selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories}
               skinTypes={skinTypes} setSkinTypes={setSkinTypes}
               concerns={concerns} setConcerns={setConcerns}
               toggle={toggle} clearAll={clearAll} hasFilters={hasFilters}
@@ -193,7 +243,7 @@ function FilterSection({ title, items, selected, onToggle }) {
   )
 }
 
-function FilterPanel({ categories, setCategories, skinTypes, setSkinTypes, concerns, setConcerns, toggle, clearAll, hasFilters }) {
+function FilterPanel({ categories, selectedCategories, setSelectedCategories, skinTypes, setSkinTypes, concerns, setConcerns, toggle, clearAll, hasFilters }) {
   return (
     <div>
       {hasFilters && (
@@ -201,7 +251,7 @@ function FilterPanel({ categories, setCategories, skinTypes, setSkinTypes, conce
           Clear all
         </button>
       )}
-      <FilterSection title="Category" items={CATEGORIES} selected={categories} onToggle={(v) => toggle(categories, setCategories, v)} />
+      <FilterSection title="Category" items={categories} selected={selectedCategories} onToggle={(v) => toggle(selectedCategories, setSelectedCategories, v)} />
       <FilterSection title="Skin Type" items={SKIN_TYPES} selected={skinTypes} onToggle={(v) => toggle(skinTypes, setSkinTypes, v)} />
       <FilterSection title="Concern" items={CONCERNS} selected={concerns} onToggle={(v) => toggle(concerns, setConcerns, v)} />
     </div>

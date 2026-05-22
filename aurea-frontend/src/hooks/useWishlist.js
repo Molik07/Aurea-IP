@@ -1,6 +1,10 @@
 import { create } from 'zustand'
+import useAuth from './useAuth'
 
-const getGuestId = () => {
+const getUserId = () => {
+  const user = useAuth.getState().user;
+  if (user && user.id) return user.id;
+
   let id = localStorage.getItem('aurea-guest-id')
   if (!id) {
     id = 'guest_' + Math.random().toString(36).substr(2, 9)
@@ -15,7 +19,7 @@ const syncWishlist = async (items) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-user-id': getGuestId()
+        'x-user-id': getUserId()
       },
       body: JSON.stringify({ items })
     })
@@ -28,11 +32,11 @@ const useWishlist = create((set, get) => ({
   items: [],
   isInitialized: false,
 
-  initWishlist: async () => {
-    if (get().isInitialized) return
+  initWishlist: async (force = false) => {
+    if (get().isInitialized && !force) return
     try {
       const res = await fetch('http://localhost:5000/api/wishlist', {
-        headers: { 'x-user-id': getGuestId() }
+        headers: { 'x-user-id': getUserId() }
       })
       if (res.ok) {
         const data = await res.json()
@@ -65,5 +69,12 @@ const useWishlist = create((set, get) => ({
     syncWishlist([])
   },
 }))
+
+// Auto-sync when auth state changes (login or logout)
+useAuth.subscribe((state, prevState) => {
+  if (state.user?.id !== prevState.user?.id) {
+    useWishlist.getState().initWishlist(true);
+  }
+});
 
 export default useWishlist

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import useProducts from '../../hooks/useProducts'
 
@@ -8,6 +8,14 @@ export default function AdminProducts() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ name: '', brand: '', category: '', price: '', description: '', images: [] })
   const [editingId, setEditingId] = useState(null)
+  const [categoriesList, setCategoriesList] = useState([])
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/categories')
+      .then(res => res.json())
+      .then(data => setCategoriesList(data))
+      .catch(err => console.error('Failed to load categories', err))
+  }, [])
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -105,7 +113,13 @@ export default function AdminProducts() {
             <div style={{ gridColumn: '1/-1' }}><p style={{ fontSize: '14px', fontWeight: 600, marginBottom: '14px' }}>{editingId ? 'Edit Product' : 'New Product'}</p></div>
             <div><label style={lbl}>Name</label><input required value={form.name} onChange={set('name')} style={fieldStyle} /></div>
             <div><label style={lbl}>Brand</label><input required value={form.brand} onChange={set('brand')} style={fieldStyle} /></div>
-            <div><label style={lbl}>Category</label><input required value={form.category} onChange={set('category')} style={fieldStyle} /></div>
+            <div>
+              <label style={lbl}>Category</label>
+              <select required value={form.category} onChange={set('category')} style={fieldStyle}>
+                <option value="" disabled>Select category</option>
+                {categoriesList.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
+              </select>
+            </div>
             <div><label style={lbl}>Price (₹)</label><input required type="number" value={form.price} onChange={set('price')} style={fieldStyle} /></div>
             <div style={{ gridColumn: '1/-1' }}><label style={lbl}>Description</label><textarea value={form.description} onChange={set('description')} style={{ ...fieldStyle, height: '80px', padding: '10px 12px', resize: 'vertical' }} /></div>
             <div style={{ gridColumn: '1/-1' }}>

@@ -49,17 +49,41 @@ const shutdown = async (signal) => {
 
 const start = async () => {
   try {
-    // Connect to all data stores before starting HTTP server
     console.log('[Server] Connecting to databases...');
-    await connectMongoDB();
-    await connectRedis();
+
+    // PostgreSQL (Prisma) — REQUIRED for auth, orders, users
     await prisma.$connect();
-    console.log('[Server] All database connections established');
+    console.log('[Server] ✅ PostgreSQL connected');
+
+    // MongoDB — optional in dev (used for product catalog)
+    try {
+      await connectMongoDB();
+      console.log('[Server] ✅ MongoDB connected');
+    } catch (err) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error('[Server] ❌ MongoDB connection failed (fatal in production):', err.message);
+        process.exit(1);
+      }
+      console.warn('[Server] ⚠️  MongoDB unavailable (non-fatal in dev) — product catalog features will be limited');
+    }
+
+    // Redis — optional in dev (used for caching)
+    try {
+      await connectRedis();
+      console.log('[Server] ✅ Redis connected');
+    } catch (err) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error('[Server] ❌ Redis connection failed (fatal in production):', err.message);
+        process.exit(1);
+      }
+      console.warn('[Server] ⚠️  Redis unavailable (non-fatal in dev) — caching will be skipped');
+    }
 
     server = app.listen(PORT, () => {
-      console.log(`[Server] Makeup Store API running on port ${PORT}`);
+      console.log(`\n[Server] 🚀 Aurea API running on port ${PORT}`);
       console.log(`[Server] Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`[Server] Health check: http://localhost:${PORT}/health`);
+      console.log(`[Server] Auth endpoints: http://localhost:${PORT}/api/auth\n`);
     });
 
     server.on('error', (err) => {
@@ -68,7 +92,7 @@ const start = async () => {
     });
 
   } catch (err) {
-    console.error('[Server] Failed to start:', err);
+    console.error('[Server] Failed to start (PostgreSQL required):', err);
     process.exit(1);
   }
 };

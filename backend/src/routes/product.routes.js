@@ -1,22 +1,78 @@
 import { Router } from 'express';
 import Product from '../models/Product.js';
 import { initialProducts } from '../lib/seedData.js';
+import { isAuthenticated, isAdmin } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// GET /api/products - Fetch all products
+// GET /api/products - Fetch products with search, filters, and pagination
 router.get('/', async (req, res) => {
   try {
-    let products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
-    
-    // Seed database if empty
-    if (products.length === 0) {
+    const { search, category, skinTypes, concerns, sort, page, limit, all } = req.query;
+
+    let query = { isActive: true };
+
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { brand: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    if (category) {
+      // Handles multiple categories if passed as comma separated
+      const categories = category.split(',').map(c => c.trim());
+      query.category = { $in: categories };
+    }
+
+    if (skinTypes) {
+      const types = skinTypes.split(',').map(s => s.trim());
+      query.skinTypes = { $in: types };
+    }
+
+    if (concerns) {
+      const c = concerns.split(',').map(c => c.trim());
+      query.concerns = { $in: c };
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === 'price-asc') sortOption = { pricePaise: 1 };
+    if (sort === 'price-desc') sortOption = { pricePaise: -1 };
+    if (sort === 'rating') sortOption = { rating: -1 };
+
+    // Seed database if empty logic
+    const totalDocs = await Product.countDocuments();
+    if (totalDocs === 0) {
       console.log('[Products] Database empty. Seeding initial products...');
       await Product.insertMany(initialProducts);
-      products = await Product.find({ isActive: true }).sort({ createdAt: -1 });
     }
+
+    if (all === 'true') {
+      const products = await Product.find(query).sort(sortOption);
+      return res.json(products); // Legacy array format for useProducts global store
+    }
+
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 12;
+    const skip = (pageNum - 1) * limitNum;
+
+    const products = await Product.find(query)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limitNum);
     
-    res.json(products);
+    const totalCount = await Product.countDocuments(query);
+
+    res.json({
+      products,
+      pagination: {
+        total: totalCount,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+      }
+    });
   } catch (error) {
     console.error('[Products] Fetch Error:', error);
     res.status(500).json({ error: 'Failed to fetch products' });
@@ -24,7 +80,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/products - Create a new product
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const payload = { ...req.body };
     delete payload.id; // Remove client-side temp id to let MongoDB generate ObjectId
@@ -39,7 +95,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/products/:id - Update a product
-router.put('/:id', async (req, res) => {
+router.put('/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const payload = { ...req.body };
     delete payload.id;
@@ -61,7 +117,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE /api/products/:id - Delete a product
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {

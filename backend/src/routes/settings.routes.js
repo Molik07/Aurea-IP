@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import redis from '../lib/redis.js';
+import { isAuthenticated, isAdmin } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
@@ -26,7 +27,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/settings - Update site settings
-router.post('/', async (req, res) => {
+router.post('/', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const currentData = await redis.get('site:settings');
     const currentSettings = currentData ? JSON.parse(currentData) : DEFAULT_SETTINGS;

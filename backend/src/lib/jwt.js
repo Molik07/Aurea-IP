@@ -12,8 +12,10 @@ export const generateAccessToken = (userId, role) => {
   });
 };
 
+import crypto from 'crypto';
+
 export const generateRefreshToken = (userId) => {
-  return jwt.sign({ userId }, JWT_REFRESH_SECRET, {
+  return jwt.sign({ userId, jti: crypto.randomUUID() }, JWT_REFRESH_SECRET, {
     expiresIn: JWT_REFRESH_EXPIRATION,
   });
 };

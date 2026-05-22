@@ -10,13 +10,15 @@ import wishlistRoutes from './routes/wishlist.routes.js';
 import productRoutes from './routes/product.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import categoryRoutes from './routes/category.routes.js';
 
 const app = express();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 app.use(
   cors({
-    origin: FRONTEND_URL,
+    origin: (origin, callback) => callback(null, true), // Reflect origin in dev
     credentials: true, // Allow cookies (refresh tokens)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
@@ -41,7 +43,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res, next) => {

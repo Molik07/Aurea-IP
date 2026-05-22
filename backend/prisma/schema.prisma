@@ -31,6 +31,14 @@ model RefreshToken {
   createdAt DateTime @default(now())
 }
 
+model EmailOtp {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 model Address {
   id        String  @id @default(cuid())
   userId    String

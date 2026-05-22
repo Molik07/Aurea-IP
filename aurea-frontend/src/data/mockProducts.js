@@ -211,3 +211,6 @@ export const mockProducts = [
 
 export const bestsellerIds = ['1', '4', '7', '11', '3']
 export const newArrivalIds = ['9', '12', '5', '8', '6']
+
+export const bestsellerNames = ['Vitamin C Brightening Serum', 'SPF 50+ Invisible Sunscreen', 'Hyaluronic Acid Hydrating Serum', 'Niacinamide 10% + Zinc Serum', 'Gentle Foam Cleanser']
+export const newArrivalNames = ['Ceramide Barrier Repair Serum', 'Squalane Facial Oil', 'Retinol Night Repair Cream', 'Kaolin Clay Purifying Mask', 'Salicylic Acid Toner']

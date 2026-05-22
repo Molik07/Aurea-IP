@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { bestsellerIds, newArrivalIds } from '../data/mockProducts'
+import { bestsellerNames, newArrivalNames } from '../data/mockProducts'
 import useProducts from '../hooks/useProducts'
 import useSettings from '../hooks/useSettings'
 import HorizontalScroll from '../components/ui/HorizontalScroll'
@@ -56,12 +56,12 @@ export default function Home() {
   const { settings } = useSettings()
   
   const bestsellers = useMemo(() => {
-    const list = bestsellerIds.map((id) => products.find((p) => p.id === id)).filter(Boolean)
+    const list = bestsellerNames.map((name) => products.find((p) => p.name === name)).filter(Boolean)
     return list.length > 0 ? list : products.slice(0, 6)
   }, [products])
 
   const newArrivals = useMemo(() => {
-    const list = newArrivalIds.map((id) => products.find((p) => p.id === id)).filter(Boolean)
+    const list = newArrivalNames.map((name) => products.find((p) => p.name === name)).filter(Boolean)
     return list.length > 0 ? list : (products.slice(6, 12).length > 0 ? products.slice(6, 12) : products.slice(0, 6))
   }, [products])
 

@@ -8,17 +8,9 @@ import useAuth from '../hooks/useAuth'
 
 const TABS = ['Overview', 'Orders', 'Addresses', 'Wishlist', 'Loyalty Points']
 
-const mockOrders = [
-  { id: '#AUR-1042', date: '2026-04-28', items: 3, total: 2799, status: 'Delivered' },
-  { id: '#AUR-0987', date: '2026-04-10', items: 1, total: 999, status: 'Delivered' },
-  { id: '#AUR-1101', date: '2026-05-01', items: 2, total: 1498, status: 'Shipped' },
-  { id: '#AUR-1115', date: '2026-05-03', items: 1, total: 449, status: 'Processing' },
-]
+const mockOrders = []
 
-const mockAddresses = [
-  { id: 1, name: 'Priya Sharma', line1: '14B, Lotus Apartments', line2: 'Linking Road', city: 'Mumbai', state: 'Maharashtra', pin: '400050', phone: '+91 98765 43210' },
-  { id: 2, name: 'Priya Sharma', line1: '22, Green Park', line2: '', city: 'New Delhi', state: 'Delhi', pin: '110016', phone: '+91 98765 43210' },
-]
+const mockAddresses = []
 
 const STATUS_COLOR = { Processing: '#f59e0b', Shipped: '#3b82f6', Delivered: '#22c55e' }
 
@@ -26,7 +18,8 @@ export default function Account() {
   const [activeTab, setActiveTab] = useState('Overview')
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, isAuthenticated, isLoading } = useAuth()
+  const { user, isLoading } = useAuth()
+  const isAuthenticated = !!user;
   const { items: wishlistIds } = useWishlist()
   const { products } = useProducts()
   const wishlistProducts = products.filter((p) => wishlistIds.includes(p.id))
@@ -47,15 +40,7 @@ export default function Account() {
     fontFamily: 'DM Sans, sans-serif', borderLeft: active ? '2px solid var(--accent)' : '2px solid transparent', transition: 'all 0.15s',
   })
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/auth', { state: { from: location }, replace: true })
-    }
-  }, [isLoading, isAuthenticated, navigate, location])
-
-  if (isLoading || !isAuthenticated) {
-    return <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading...</div>
-  }
+  // ProtectedRoute handles auth checks before this component renders.
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
@@ -67,6 +52,23 @@ export default function Account() {
             {TABS.map((t) => (
               <button key={t} onClick={() => setActiveTab(t)} style={tabStyle(activeTab === t)}>{t}</button>
             ))}
+            {user?.role === 'admin' && (
+              <div className="admin-btn-wrapper">
+                <Link to="/admin" className="admin-btn-inner">
+                  Admin Portal
+                </Link>
+              </div>
+            )}
+            <button 
+              onClick={async () => {
+                const { logout } = useAuth.getState();
+                await logout();
+                navigate('/auth');
+              }} 
+              style={{...tabStyle(false), color: '#e53e3e', marginTop: '24px'}}
+            >
+              Log Out
+            </button>
           </nav>
 
           {/* Mobile tabs */}
@@ -80,13 +82,19 @@ export default function Account() {
           <div style={{ flex: 1 }}>
             {activeTab === 'Overview' && (
               <div>
-                <p style={{ fontSize: '20px', fontFamily: 'Playfair Display, serif', marginBottom: '24px' }}>Welcome back, Priya 👋</p>
+                <p style={{ fontSize: '20px', fontFamily: 'Playfair Display, serif', marginBottom: '24px' }}>Welcome back, {user?.name?.split(' ')[0] || 'User'} 👋</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '28px' }}>
-                  <InfoCard title="Loyalty Points" value="1,250 pts" sub="Gold Tier" />
+                  <InfoCard title="Loyalty Points" value="0 pts" sub="Bronze Tier" />
                   <InfoCard title="Total Orders" value={mockOrders.length} sub="Since joining" />
                 </div>
-                <p style={{ fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '12px' }}>Last Order</p>
-                <OrderRow order={mockOrders[2]} />
+                {mockOrders.length > 0 ? (
+                  <>
+                    <p style={{ fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '12px' }}>Last Order</p>
+                    <OrderRow order={mockOrders[0]} />
+                  </>
+                ) : (
+                  <p style={{ fontSize: '14px', color: 'var(--text-mid)', fontStyle: 'italic' }}>You haven't placed any orders yet.</p>
+                )}
               </div>
             )}
 
@@ -94,7 +102,11 @@ export default function Account() {
               <div>
                 <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '22px', marginBottom: '20px' }}>Your Orders</h2>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-                  {mockOrders.map((o) => <OrderRow key={o.id} order={o} />)}
+                  {mockOrders.length > 0 ? (
+                    mockOrders.map((o) => <OrderRow key={o.id} order={o} />)
+                  ) : (
+                    <p style={{ fontSize: '14px', color: 'var(--text-mid)', fontStyle: 'italic' }}>You haven't placed any orders yet. <Link to="/products" style={{ textDecoration: 'underline' }}>Start shopping</Link></p>
+                  )}
                 </div>
               </div>
             )}
@@ -105,7 +117,7 @@ export default function Account() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {addresses.map((a) => (
                     <div key={a.id} style={{ padding: '20px', border: '1px solid var(--border)' }}>
-                      <p style={{ fontWeight: 600, marginBottom: '4px' }}>{a.name}</p>
+                      <p style={{ fontWeight: 600, marginBottom: '4px' }}>{user?.name || a.name}</p>
                       <p style={{ fontSize: '14px', color: 'var(--text-mid)', lineHeight: 1.6 }}>{a.line1}{a.line2 ? `, ${a.line2}` : ''}, {a.city}, {a.state} – {a.pin}</p>
                       <p style={{ fontSize: '14px', color: 'var(--text-mid)' }}>{a.phone}</p>
                       <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
@@ -135,9 +147,9 @@ export default function Account() {
             {activeTab === 'Loyalty Points' && (
               <div>
                 <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '22px', marginBottom: '8px' }}>Loyalty Points</h2>
-                <p style={{ fontSize: '36px', fontWeight: 600, marginBottom: '4px' }}>1,250</p>
-                <p style={{ fontSize: '14px', color: 'var(--text-light)', marginBottom: '28px' }}>Gold Tier · 750 pts to Platinum</p>
-                <ProgressBar current={1250} total={2000} label="Progress to Platinum" showPercent />
+                <p style={{ fontSize: '36px', fontWeight: 600, marginBottom: '4px' }}>0</p>
+                <p style={{ fontSize: '14px', color: 'var(--text-light)', marginBottom: '28px' }}>Bronze Tier · 500 pts to Silver</p>
+                <ProgressBar current={0} total={500} label="Progress to Silver" showPercent />
                 <div style={{ marginTop: '28px', padding: '20px', border: '1px solid var(--border)' }}>
                   <p style={{ fontWeight: 600, marginBottom: '12px' }}>How to earn points</p>
                   {['Every ₹100 spent = 10 points', 'Write a review = 50 points', 'Refer a friend = 200 points', 'Birthday bonus = 100 points'].map((t) => (
@@ -155,6 +167,58 @@ export default function Account() {
           .account-tabs-mobile { display: flex !important; }
           .account-layout { flex-direction: column; gap: 0 !important; }
           .wishlist-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        .admin-btn-wrapper {
+          position: relative;
+          display: inline-block;
+          width: max-content;
+          margin-top: 12px;
+          margin-bottom: 8px;
+          border-radius: 6px;
+          overflow: hidden;
+          padding: 1px; /* border thickness */
+        }
+
+        .admin-btn-wrapper::before,
+        .admin-btn-wrapper::after {
+          content: '';
+          position: absolute;
+          top: -100%;
+          left: -100%;
+          width: 300%;
+          height: 300%;
+          background: conic-gradient(from 0deg, transparent 75%, rgba(0,0,0,0.85) 100%);
+          animation: admin-spin 3s linear infinite;
+          z-index: 0;
+        }
+
+        .admin-btn-wrapper::after {
+          filter: blur(4px); /* The glow effect */
+        }
+
+        .admin-btn-inner {
+          position: relative;
+          z-index: 1;
+          display: block;
+          padding: 10px 14px;
+          font-size: 14px;
+          color: var(--text);
+          font-weight: 600;
+          font-family: 'DM Sans', sans-serif;
+          text-decoration: none;
+          background: var(--bg);
+          border-radius: 5px; /* slightly less than wrapper to fit inside */
+          transition: background 0.2s;
+        }
+
+        .admin-btn-inner:hover {
+          background: #fdfaf7; /* very slight highlight on hover to feel clickable */
+        }
+
+        @keyframes admin-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </main>

@@ -22,12 +22,12 @@ const useProducts = create((set, get) => ({
         } catch (e) {}
       }
 
-      const res = await fetch(API_URL)
+      const res = await fetch(`${API_URL}?all=true`)
       if (res.ok) {
         let dbProducts = await res.json()
 
         // Filter local products that have Cloudinary images
-        const cloudinaryProducts = localProducts.filter(p => p.images && p.images.some(img => typeof img === 'string' && img.includes('cloudinary.com')))
+        const cloudinaryProducts = Array.isArray(localProducts) ? localProducts.filter(p => p.images && p.images.some(img => typeof img === 'string' && img.includes('cloudinary.com'))) : []
         
         if (cloudinaryProducts.length > 0) {
           let updatedAny = false
@@ -56,7 +56,7 @@ const useProducts = create((set, get) => ({
             }
           }
           if (updatedAny) {
-            const res2 = await fetch(API_URL)
+            const res2 = await fetch(`${API_URL}?all=true`)
             dbProducts = await res2.json()
           }
         }
