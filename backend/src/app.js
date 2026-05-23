@@ -16,9 +16,24 @@ import categoryRoutes from './routes/category.routes.js';
 const app = express();
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
+// IMPORTANT: After deploying the frontend to Vercel, set FRONTEND_URL on Railway
+// to your Vercel URL (e.g. https://aurea.vercel.app) and redeploy the backend.
+const allowedOrigins = [
+  FRONTEND_URL,               // Set on Railway after Vercel deploy
+  'http://localhost:5173',     // Vite dev server
+  'http://localhost:3000',     // Alternative local port
+].filter(Boolean);            // Remove empty strings (FRONTEND_URL not set yet)
+
 app.use(
   cors({
-    origin: (origin, callback) => callback(null, true), // Reflect origin in dev
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, Postman, mobile apps)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true, // Allow cookies (refresh tokens)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],

@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { mockProducts } from '../data/mockProducts'
+import API_BASE_URL from '../lib/api'
 
-const API_URL = 'http://localhost:5000/api/products'
+const API_URL = `${API_BASE_URL}/api/products`
 
 const useProducts = create((set, get) => ({
   products: mockProducts, // Start with rich mock data immediately to avoid UI loading flashes

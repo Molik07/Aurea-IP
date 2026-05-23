@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ui/ProductCard'
+import API_BASE_URL from '../lib/api'
 const SKIN_TYPES = ['Oily', 'Dry', 'Combination', 'Sensitive', 'Normal']
 const CONCERNS = ['Acne', 'Hydration', 'Brightening', 'Anti-Aging', 'SPF']
 const SORT_OPTIONS = [
@@ -11,6 +12,7 @@ const SORT_OPTIONS = [
 ]
 
 export default function ProductListing() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [selectedCategories, setSelectedCategories] = useState(() => {
     const c = searchParams.get('category')
     return c ? [c] : []
@@ -49,8 +51,8 @@ export default function ProductListing() {
         params.append('limit', 12);
 
         const [prodRes, catRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/products?${params.toString()}`),
-          fetch(`http://localhost:5000/api/categories`)
+          fetch(`${API_BASE_URL}/api/products?${params.toString()}`),
+          fetch(`${API_BASE_URL}/api/categories`)
         ]);
 
         if (prodRes.ok) {

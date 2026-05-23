@@ -1,6 +1,7 @@
 import { create } from 'zustand';
+import API_BASE_URL from '../lib/api';
 
-const API_BASE = '/api/auth';
+const API_BASE = `${API_BASE_URL}/api/auth`;
 
 const useAuth = create((set) => ({
   user: null,
