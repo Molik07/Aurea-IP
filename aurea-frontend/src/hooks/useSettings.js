@@ -1,7 +1,6 @@
 import { create } from 'zustand'
-import API_BASE_URL from '../lib/api'
 
-const API_URL = `${API_BASE_URL}/api/settings`
+const API_URL = 'http://localhost:5000/api/settings'
 
 // Helper to safely extract user's legacy homepage picture from browser cache
 const getLegacyHeroImage = () => {

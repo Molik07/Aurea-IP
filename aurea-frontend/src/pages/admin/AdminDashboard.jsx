@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import API_BASE_URL from '../../lib/api'
 
 const STATUS_COLOR = {
   pending: '#f59e0b',
@@ -90,7 +89,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken')
-    fetch(`${API_BASE_URL}/api/admin/stats`, {
+    fetch('http://localhost:5000/api/admin/stats', {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())

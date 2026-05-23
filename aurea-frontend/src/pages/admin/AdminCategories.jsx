@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
-import API_BASE_URL from '../../lib/api'
 
 export default function AdminCategories() {
   const { user } = useAuth()
@@ -11,7 +10,7 @@ export default function AdminCategories() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/categories`)
+      const res = await fetch('http://localhost:5000/api/categories')
       if (res.ok) setCategories(await res.json())
     } catch (e) {
       console.error(e)
@@ -25,7 +24,7 @@ export default function AdminCategories() {
   const handleAdd = async (e) => {
     e.preventDefault()
     try {
-      const res = await fetch(`${API_BASE_URL}/api/categories`, {
+      const res = await fetch('http://localhost:5000/api/categories', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -48,7 +47,7 @@ export default function AdminCategories() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this category?')) return
     try {
-      const res = await fetch(`${API_BASE_URL}/api/categories/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/categories/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
       })

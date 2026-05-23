@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import useProducts from '../../hooks/useProducts'
-import API_BASE_URL from '../../lib/api'
 
 export default function AdminProducts() {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts()
@@ -12,7 +11,7 @@ export default function AdminProducts() {
   const [categoriesList, setCategoriesList] = useState([])
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/categories`)
+    fetch('http://localhost:5000/api/categories')
       .then(res => res.json())
       .then(data => setCategoriesList(data))
       .catch(err => console.error('Failed to load categories', err))

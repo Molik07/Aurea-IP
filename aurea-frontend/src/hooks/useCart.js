@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import API_BASE_URL from '../lib/api'
 
 const getGuestId = () => {
   let id = localStorage.getItem('aurea-guest-id')
@@ -12,7 +11,7 @@ const getGuestId = () => {
 
 const syncCart = async (items) => {
   try {
-    await fetch(`${API_BASE_URL}/api/cart`, {
+    await fetch('http://localhost:5000/api/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,7 +32,7 @@ const useCart = create((set, get) => ({
   initCart: async () => {
     if (get().isInitialized) return
     try {
-      const res = await fetch(`${API_BASE_URL}/api/cart`, {
+      const res = await fetch('http://localhost:5000/api/cart', {
         headers: { 'x-user-id': getGuestId() }
       })
       if (res.ok) {

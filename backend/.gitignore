@@ -5,10 +5,9 @@ node_modules/
 .env
 .env.local
 .env.production
-!.env.example
 
-# Prisma — keep migrations committed (Railway needs them to migrate on deploy)
-# prisma/migrations/ is intentionally NOT ignored
+# Prisma
+prisma/migrations/
 
 # Logs
 *.log

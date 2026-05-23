@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import useAuth from './useAuth'
-import API_BASE_URL from '../lib/api'
 
 const getUserId = () => {
   const user = useAuth.getState().user;
@@ -16,7 +15,7 @@ const getUserId = () => {
 
 const syncWishlist = async (items) => {
   try {
-    await fetch(`${API_BASE_URL}/api/wishlist`, {
+    await fetch('http://localhost:5000/api/wishlist', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,7 +35,7 @@ const useWishlist = create((set, get) => ({
   initWishlist: async (force = false) => {
     if (get().isInitialized && !force) return
     try {
-      const res = await fetch(`${API_BASE_URL}/api/wishlist`, {
+      const res = await fetch('http://localhost:5000/api/wishlist', {
         headers: { 'x-user-id': getUserId() }
       })
       if (res.ok) {
