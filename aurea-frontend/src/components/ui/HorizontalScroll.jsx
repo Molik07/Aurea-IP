@@ -34,54 +34,79 @@ export default function HorizontalScroll({ children, title }) {
     <div style={{ position: 'relative' }}>
       {title && (
         <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
           padding: '0 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           marginBottom: '28px',
         }}>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text)' }}>
             {title}
           </h2>
-          <div style={{ display: 'flex', gap: '8px' }} className="scroll-arrows">
-            <button onClick={() => scrollBy(-1)} aria-label="Scroll left" style={{ width: '40px', height: '40px', border: '1px solid var(--border)', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-            </button>
-            <button onClick={() => scrollBy(1)} aria-label="Scroll right" style={{ width: '40px', height: '40px', border: '1px solid var(--border)', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
-            </button>
-          </div>
         </div>
       )}
 
-      <div
-        ref={ref}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        style={{
-          display: 'flex',
-          gap: '20px',
-          overflowX: 'scroll',
-          scrollSnapType: 'x mandatory',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          cursor: 'grab',
-          paddingLeft: '24px',
-          paddingRight: '24px',
-          paddingBottom: '4px',
-          userSelect: 'none',
-        }}
-      >
-        {children}
+      <div style={{ position: 'relative' }}>
+        <button onClick={() => scrollBy(-1)} aria-label="Scroll left" className="scroll-arrow left-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+
+        <div
+          ref={ref}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          style={{
+            display: 'flex',
+            gap: '20px',
+            overflowX: 'scroll',
+            scrollSnapType: 'x mandatory',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            cursor: 'grab',
+            paddingLeft: '24px',
+            paddingRight: '24px',
+            paddingBottom: '4px',
+            userSelect: 'none',
+          }}
+        >
+          {children}
+        </div>
+
+        <button onClick={() => scrollBy(1)} aria-label="Scroll right" className="scroll-arrow right-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
       </div>
 
       <style>{`
         @media (max-width: 768px) {
-          .scroll-arrows { display: none !important; }
+          .scroll-arrow { display: none !important; }
+        }
+        .scroll-arrow {
+          position: absolute;
+          top: 40%;
+          transform: translateY(-50%);
+          width: 40px;
+          height: 40px;
+          border: 1px solid var(--border);
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(4px);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          color: var(--text);
+          transition: background 0.2s;
+        }
+        .scroll-arrow:hover {
+          background: #fff;
+        }
+        .left-arrow {
+          left: 0;
+          border-left: none;
+        }
+        .right-arrow {
+          right: 0;
+          border-right: none;
         }
       `}</style>
     </div>
