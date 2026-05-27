@@ -59,8 +59,8 @@ export default function AdminProducts() {
   const openCloudinaryWidget = () => {
     window.cloudinary.createUploadWidget(
       {
-        cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
-        uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+        cloudName: 'dfsljxtyj',
+        uploadPreset: 'aurea_uploads',
         sources: ['local', 'url', 'camera'],
         multiple: true,
         maxFiles: 5,
