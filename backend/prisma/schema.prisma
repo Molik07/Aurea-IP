@@ -64,6 +64,12 @@ model Order {
   updatedAt  DateTime    @updatedAt
 }
 
+model SiteSettings {
+  id        String   @id @default("global")
+  heroImage String   @default("")
+  updatedAt DateTime @updatedAt
+}
+
 model OrderItem {
   id             String @id @default(cuid())
   orderId        String

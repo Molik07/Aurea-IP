@@ -1,80 +1,58 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`
 
-// Helper to safely extract user's legacy homepage picture from browser cache
-const getLegacyHeroImage = () => {
-  try {
-    const localData = localStorage.getItem('aurea-site-settings')
-    if (localData) {
-      const parsed = JSON.parse(localData)
-      if (parsed?.state?.settings?.heroImage) {
-        return parsed.state.settings.heroImage
-      }
-    }
-  } catch (e) {}
-  return null
-}
+const useSettings = create(
+  persist(
+    (set, get) => ({
+      settings: {
+        heroImage: '',
+      },
+      isInitialized: false,
 
-const defaultUnsplash = ''
-const initialHeroImage = getLegacyHeroImage() || defaultUnsplash
-
-const useSettings = create((set, get) => ({
-  settings: {
-    heroImage: initialHeroImage,
-  },
-  isInitialized: false,
-
-  initSettings: async () => {
-    if (get().isInitialized) return
-    try {
-      const legacyHeroImage = getLegacyHeroImage()
-
-      const res = await fetch(API_URL)
-      if (res.ok) {
-        let data = await res.json()
-
-        // If the user has a custom picture saved locally (e.g. from Cloudinary), commit it back to the Redis store permanently
-        if (legacyHeroImage && legacyHeroImage !== defaultUnsplash) {
-          if (data.heroImage !== legacyHeroImage) {
-            console.log('Restoring legacy user homepage picture to backend database...')
-            await fetch(API_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ heroImage: legacyHeroImage }),
-            })
-            data.heroImage = legacyHeroImage
+      initSettings: async () => {
+        if (get().isInitialized) return
+        try {
+          const res = await fetch(API_URL)
+          if (res.ok) {
+            const data = await res.json()
+            // Server data always wins over local cache
+            set({ settings: data, isInitialized: true })
+          } else {
+            // Server unavailable — keep whatever we have in localStorage
+            set({ isInitialized: true })
           }
+        } catch (error) {
+          console.error('Failed to fetch site settings from DB:', error)
+          // Network error — keep localStorage data so the image still shows
+          set({ isInitialized: true })
         }
+      },
 
-        set({ settings: data, isInitialized: true })
-      } else {
-        set({ isInitialized: true })
-      }
-    } catch (error) {
-      console.error('Failed to fetch site settings from DB:', error)
-      set({ isInitialized: true })
+      updateSettings: async (newSettings) => {
+        // Optimistic update so the UI responds immediately
+        set((state) => ({ settings: { ...state.settings, ...newSettings } }))
+        try {
+          const token = localStorage.getItem('accessToken')
+          await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify(newSettings),
+          })
+        } catch (error) {
+          console.error('Failed to update site settings in DB:', error)
+        }
+      },
+    }),
+    {
+      name: 'aurea-site-settings', // localStorage key
+      partialize: (state) => ({ settings: state.settings }), // only persist settings, not isInitialized
     }
-  },
-
-  updateSettings: async (newSettings) => {
-    // Optimistic update for premium real-time admin responsiveness
-    set((state) => ({ settings: { ...state.settings, ...newSettings } }))
-    try {
-      // Read auth token from localStorage (set during login)
-      const token = localStorage.getItem('accessToken')
-      await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(newSettings),
-      })
-    } catch (error) {
-      console.error('Failed to update site settings in DB:', error)
-    }
-  },
-}))
+  )
+)
 
 export default useSettings
