@@ -16,7 +16,7 @@ const getLegacyHeroImage = () => {
   return null
 }
 
-const defaultUnsplash = 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&auto=format&fit=crop&q=80'
+const defaultUnsplash = ''
 const initialHeroImage = getLegacyHeroImage() || defaultUnsplash
 
 const useSettings = create((set, get) => ({

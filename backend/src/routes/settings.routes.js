@@ -5,7 +5,7 @@ import { isAuthenticated, isAdmin } from '../middlewares/auth.middleware.js';
 const router = Router();
 
 const DEFAULT_SETTINGS = {
-  heroImage: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&auto=format&fit=crop&q=80',
+  heroImage: '',
 };
 
 // GET /api/settings - Fetch global site settings
