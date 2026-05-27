@@ -34,6 +34,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // ─── Health Check ────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.json({ success: true, message: 'Aurea API is Live!' });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ success: true, message: 'Makeup Store API is running (DB Setup Mode)', timestamp: new Date().toISOString() });
 });
