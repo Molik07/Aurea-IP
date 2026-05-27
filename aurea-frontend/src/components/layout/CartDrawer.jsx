@@ -182,7 +182,11 @@ function CartItem({ item, updateQuantity, removeItem }) {
       borderBottom: '1px solid var(--border)',
     }}>
       {/* IMAGE SLOT */}
-      <div style={{ width: '72px', height: '72px', flexShrink: 0, background: '#e8e4df' }} />
+      <div style={{ width: '72px', height: '72px', flexShrink: 0, background: '#e8e4df', overflow: 'hidden' }}>
+        {item.image && (
+          <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/', '/upload/w_150,q_auto,f_auto/') : item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        )}
+      </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>

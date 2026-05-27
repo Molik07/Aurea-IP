@@ -69,6 +69,7 @@ const useCart = create((set, get) => ({
           name: product.name,
           brand: product.brand,
           price: product.discountPrice || product.price,
+          image: product.images && product.images.length > 0 ? product.images[0] : null,
           shade,
           quantity,
         },
