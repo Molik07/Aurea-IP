@@ -114,7 +114,11 @@ export default function Checkout() {
                   {items.map((item) => (
                     <div key={item.key} style={{ display: 'flex', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
                       {/* IMAGE SLOT */}
-                      <div style={{ width: '52px', height: '52px', flexShrink: 0, background: '#e8e4df' }} />
+                      <div style={{ width: '52px', height: '52px', flexShrink: 0, background: '#e8e4df', overflow: 'hidden' }}>
+                        {item.image && (
+                          <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/', '/upload/w_100,q_auto,f_auto/') : item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        )}
+                      </div>
                       <div style={{ flex: 1 }}>
                         <p style={{ fontSize: '13px', fontWeight: 500 }}>{item.name}</p>
                         {item.shade && <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>{item.shade.name}</p>}

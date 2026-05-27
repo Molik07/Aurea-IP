@@ -1,10 +1,13 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { mockProducts } from '../data/mockProducts'
 
 const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products`
 
-const useProducts = create((set, get) => ({
-  products: mockProducts, // Start with rich mock data immediately to avoid UI loading flashes
+const useProducts = create(
+  persist(
+    (set, get) => ({
+      products: mockProducts, // Start with rich mock data immediately to avoid UI loading flashes
   isInitialized: false,
 
   initProducts: async () => {
@@ -75,9 +78,13 @@ const useProducts = create((set, get) => ({
     // Optimistic update for premium snappy UI feel
     set((state) => ({ products: [product, ...state.products] }))
     try {
+      const token = localStorage.getItem('accessToken')
       const res = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(product),
       })
       if (res.ok) {
@@ -98,9 +105,13 @@ const useProducts = create((set, get) => ({
       products: state.products.map((p) => p.id === id ? { ...p, ...updatedProduct } : p),
     }))
     try {
+      const token = localStorage.getItem('accessToken')
       await fetch(`${API_URL}/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify(updatedProduct),
       })
     } catch (error) {
@@ -114,13 +125,23 @@ const useProducts = create((set, get) => ({
       products: state.products.filter((p) => p.id !== id),
     }))
     try {
+      const token = localStorage.getItem('accessToken')
       await fetch(`${API_URL}/${id}`, {
         method: 'DELETE',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
       })
     } catch (error) {
       console.error('Failed to delete product in DB:', error)
     }
   },
-}))
+}),
+    {
+      name: 'aurea-products-storage', // localStorage key
+      partialize: (state) => ({ products: state.products }), // only persist products
+    }
+  )
+)
 
 export default useProducts

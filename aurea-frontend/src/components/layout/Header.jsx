@@ -7,7 +7,6 @@ const navLinks = [
   { label: 'Bestsellers', path: '/products?sort=bestseller' },
   { label: 'New Arrivals', path: '/products?sort=new' },
   { label: 'Quiz', path: '/quiz' },
-  { label: 'About', path: '/about' },
 ]
 
 export default function Header() {
