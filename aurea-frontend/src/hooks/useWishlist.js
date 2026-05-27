@@ -15,7 +15,7 @@ const getUserId = () => {
 
 const syncWishlist = async (items) => {
   try {
-    await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/wishlist`, {
+    await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/wishlist`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ const useWishlist = create((set, get) => ({
   initWishlist: async (force = false) => {
     if (get().isInitialized && !force) return
     try {
-      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/wishlist`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/wishlist`, {
         headers: { 'x-user-id': getUserId() }
       })
       if (res.ok) {

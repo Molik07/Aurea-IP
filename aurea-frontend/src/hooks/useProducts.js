@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { mockProducts } from '../data/mockProducts'
 
-const API_URL = `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products`
+const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products`
 
 const useProducts = create((set, get) => ({
   products: mockProducts, // Start with rich mock data immediately to avoid UI loading flashes

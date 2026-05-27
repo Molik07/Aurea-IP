@@ -50,8 +50,8 @@ export default function ProductListing() {
         params.append('limit', 12);
 
         const [prodRes, catRes] = await Promise.all([
-          fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products?${params.toString()}`),
-          fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/categories`)
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/products?${params.toString()}`),
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/categories`)
         ]);
 
         if (prodRes.ok) {
