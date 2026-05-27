@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const API_URL = 'http://localhost:5000/api/settings'
+const API_URL = `\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/settings`
 
 // Helper to safely extract user's legacy homepage picture from browser cache
 const getLegacyHeroImage = () => {

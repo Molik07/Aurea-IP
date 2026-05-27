@@ -11,7 +11,7 @@ export default function AdminProducts() {
   const [categoriesList, setCategoriesList] = useState([])
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/categories')
+    fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/categories`)
       .then(res => res.json())
       .then(data => setCategoriesList(data))
       .catch(err => console.error('Failed to load categories', err))

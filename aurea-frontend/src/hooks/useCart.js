@@ -11,7 +11,7 @@ const getGuestId = () => {
 
 const syncCart = async (items) => {
   try {
-    await fetch('http://localhost:5000/api/cart', {
+    await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/cart`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ const useCart = create((set, get) => ({
   initCart: async () => {
     if (get().isInitialized) return
     try {
-      const res = await fetch('http://localhost:5000/api/cart', {
+      const res = await fetch(`\${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/cart`, {
         headers: { 'x-user-id': getGuestId() }
       })
       if (res.ok) {
