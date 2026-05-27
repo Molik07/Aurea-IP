@@ -61,9 +61,14 @@ const useSettings = create((set, get) => ({
     // Optimistic update for premium real-time admin responsiveness
     set((state) => ({ settings: { ...state.settings, ...newSettings } }))
     try {
+      // Read auth token from localStorage (set during login)
+      const token = localStorage.getItem('accessToken')
       await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(newSettings),
       })
     } catch (error) {
