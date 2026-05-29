@@ -21,8 +21,8 @@ export default function Checkout() {
   }
 
   const fieldStyle = {
-    width: '100%', height: '44px', padding: '0 12px', border: '1px solid var(--border)',
-    background: 'var(--bg)', fontFamily: 'DM Sans, sans-serif', fontSize: '14px', outline: 'none',
+    width: '100%', height: '48px', padding: '0 12px', border: '1px solid var(--border)',
+    background: 'var(--bg)', fontFamily: 'DM Sans, sans-serif', fontSize: '16px', outline: 'none',
   }
 
   const labelStyle = { display: 'block', fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '6px' }
@@ -43,8 +43,8 @@ export default function Checkout() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 24px' }}>
-        <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', fontWeight: 500, marginBottom: '40px' }}>Checkout</h1>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 16px' }} className="checkout-outer">
+        <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: 500, marginBottom: '32px' }}>Checkout</h1>
         <div style={{ display: 'grid', gridTemplateColumns: '60% 1fr', gap: '48px' }} className="checkout-grid">
           {/* Form */}
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -142,7 +142,13 @@ export default function Checkout() {
           </div>
         </div>
       </div>
-      <style>{`@media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style>{`
+        @media (max-width: 768px) {
+          .checkout-grid { grid-template-columns: 1fr !important; }
+          .checkout-outer { padding: 16px !important; }
+          .checkout-outer h1 { margin-bottom: 20px !important; }
+        }
+      `}</style>
     </main>
   )
 }

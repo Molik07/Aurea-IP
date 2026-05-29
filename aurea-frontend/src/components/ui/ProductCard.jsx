@@ -20,7 +20,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      style={{ textDecoration: 'none', color: 'inherit', display: 'block', minWidth: '220px', maxWidth: '260px' }}
+      style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -48,17 +48,19 @@ export default function ProductCard({ product }) {
           }}
           style={{
             position: 'absolute',
-            top: '10px',
-            right: '10px',
-            background: 'rgba(255,255,255,0.9)',
+            top: '8px',
+            right: '8px',
+            background: 'rgba(255,255,255,0.92)',
             border: 'none',
-            width: '32px',
-            height: '32px',
+            width: '36px',
+            height: '36px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             zIndex: 2,
+            borderRadius: '50%',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
           }}
           aria-label="Add to wishlist"
         >

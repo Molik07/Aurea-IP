@@ -73,7 +73,10 @@ input, textarea, select {
 
 @media (max-width: 768px) {
   .section-pad {
-    padding: 48px 0;
+    padding: 40px 0;
+  }
+  .container {
+    padding: 0 16px;
   }
 }
 
@@ -106,4 +109,48 @@ input, textarea, select {
 
 .pill {
   border-radius: 100px;
+}
+
+/* ─── Touch-friendly tap targets ─── */
+@media (max-width: 768px) {
+  button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ─── Uniform icon button sizing (44×44 touch target) ─── */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ─── Horizontal scroll card sizing ─── */
+.hs-card {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  width: 220px;
+}
+
+@media (max-width: 768px) {
+  .hs-card {
+    width: calc(50vw - 28px);
+    min-width: 150px;
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hs-card {
+    width: calc(50vw - 24px);
+    min-width: 140px;
+  }
 }

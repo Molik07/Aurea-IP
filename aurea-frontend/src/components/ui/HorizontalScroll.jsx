@@ -30,14 +30,28 @@ export default function HorizontalScroll({ children, title }) {
     ref.current.scrollBy({ left: dir * 280, behavior: 'smooth' })
   }
 
+  // Wrap each child in an hs-card div for responsive sizing
+  const wrappedChildren = Array.isArray(children)
+    ? children.map((child, i) => (
+        <div key={i} className="hs-card">
+          {child}
+        </div>
+      ))
+    : <div className="hs-card">{children}</div>
+
   return (
     <div style={{ position: 'relative' }}>
       {title && (
         <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           padding: '0 24px',
-          marginBottom: '28px',
-        }}>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text)' }}>
+          marginBottom: '20px',
+        }}
+          className="hs-header"
+        >
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '26px', fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--text)' }}>
             {title}
           </h2>
         </div>
@@ -56,7 +70,7 @@ export default function HorizontalScroll({ children, title }) {
           onMouseLeave={handleMouseUp}
           style={{
             display: 'flex',
-            gap: '20px',
+            gap: '16px',
             overflowX: 'scroll',
             scrollSnapType: 'x mandatory',
             scrollbarWidth: 'none',
@@ -68,7 +82,7 @@ export default function HorizontalScroll({ children, title }) {
             userSelect: 'none',
           }}
         >
-          {children}
+          {wrappedChildren}
         </div>
 
         <button onClick={() => scrollBy(1)} aria-label="Scroll right" className="scroll-arrow right-arrow">
@@ -79,6 +93,8 @@ export default function HorizontalScroll({ children, title }) {
       <style>{`
         @media (max-width: 768px) {
           .scroll-arrow { display: none !important; }
+          .hs-header { padding: 0 16px !important; }
+          .hs-header h2 { font-size: 22px !important; }
         }
         .scroll-arrow {
           position: absolute;
@@ -112,3 +128,4 @@ export default function HorizontalScroll({ children, title }) {
     </div>
   )
 }
+

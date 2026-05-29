@@ -75,7 +75,21 @@ export default function TrustBar() {
       <style>{`
         @media (max-width: 768px) {
           .trust-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .trust-item { border-right: none !important; border-bottom: 1px solid var(--border); }
+          .trust-item {
+            border-right: none !important;
+            border-bottom: 1px solid var(--border);
+            padding: 20px 12px !important;
+          }
+          .trust-item:nth-child(1),
+          .trust-item:nth-child(2) {
+            border-right: none !important;
+          }
+          .trust-item:nth-last-child(-n+2) {
+            border-bottom: none !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .trust-item:nth-child(odd) { border-right: 1px solid var(--border); }
         }
       `}</style>
     </div>

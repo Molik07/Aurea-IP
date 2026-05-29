@@ -80,34 +80,35 @@ export default function Home() {
     <main>
       {/* Hero */}
       <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
-        <div style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '0 24px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '48px',
-          alignItems: 'center',
-          minHeight: '520px',
-        }}
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '0 24px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '48px',
+            alignItems: 'center',
+            minHeight: '480px',
+          }}
           className="hero-grid"
         >
           <div>
-            <p style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '12px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '14px' }}>
               Science-Backed Skincare
             </p>
             <h1 style={{
               fontFamily: 'Playfair Display, serif',
-              fontSize: 'clamp(36px, 5vw, 56px)',
+              fontSize: 'clamp(32px, 5vw, 56px)',
               fontWeight: 600,
               letterSpacing: '-0.02em',
               lineHeight: 1.15,
               color: 'var(--text)',
-              marginBottom: '20px',
+              marginBottom: '16px',
             }}>
               Radiance,<br />Redefined.
             </h1>
-            <p style={{ fontSize: '16px', color: 'var(--text-mid)', lineHeight: 1.7, maxWidth: '400px', marginBottom: '32px' }}>
+            <p style={{ fontSize: '15px', color: 'var(--text-mid)', lineHeight: 1.7, maxWidth: '400px', marginBottom: '28px' }}>
               Formulated by dermatologists. Loved by thousands. Skincare that actually works for Indian skin.
             </p>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
@@ -115,7 +116,7 @@ export default function Home() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '44px',
+                height: '48px',
                 padding: '0 28px',
                 backgroundColor: 'var(--accent)',
                 color: 'var(--white)',
@@ -132,7 +133,7 @@ export default function Home() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '44px',
+                height: '48px',
                 padding: '0 28px',
                 backgroundColor: 'transparent',
                 color: 'var(--accent)',
@@ -167,10 +168,25 @@ export default function Home() {
             )}
           </div>
         </div>
+        <style>{`
+          @media (max-width: 900px) {
+            .hero-grid {
+              grid-template-columns: 1fr !important;
+              gap: 32px !important;
+              min-height: unset !important;
+              padding: 0 16px !important;
+            }
+            .hero-image {
+              display: flex !important;
+              aspect-ratio: 3 / 2 !important;
+              width: 100%;
+            }
+          }
+        `}</style>
       </section>
 
       {/* YouTube Banner */}
-      <div style={{ position: 'relative', width: '100%', overflow: 'hidden', height: '416px', backgroundColor: '#111' }}>
+      <div className="yt-banner" style={{ position: 'relative', width: '100%', overflow: 'hidden', backgroundColor: '#111' }}>
         <div style={{ opacity: 0, animation: 'fadeIn 1s ease 1.5s forwards' }}>
           <iframe
             src={`https://www.youtube.com/embed/4KtHgUEKBts?autoplay=1&mute=1&loop=1&playlist=4KtHgUEKBts&controls=0&showinfo=0&rel=0&modestbranding=1&start=${videoStart}&playsinline=1&disablekb=1&fs=0&iv_load_policy=3`}
@@ -191,9 +207,10 @@ export default function Home() {
           />
         </div>
         <style>{`
-          @keyframes fadeIn {
-            to { opacity: 1; }
-          }
+          @keyframes fadeIn { to { opacity: 1; } }
+          .yt-banner { height: 416px; }
+          @media (max-width: 900px) { .yt-banner { height: 280px; } }
+          @media (max-width: 768px) { .yt-banner { height: 220px; } }
         `}</style>
         <div style={{
           position: 'absolute',
@@ -204,27 +221,26 @@ export default function Home() {
       </div>
 
       {/* Bestsellers */}
-      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '72px', paddingBottom: '72px' }}>
+      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '48px', paddingBottom: '48px' }}>
         <HorizontalScroll title="Bestsellers">
           {bestsellers.map((p) => (
-            <div key={p.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
-              <ProductCard product={p} />
-            </div>
+            <ProductCard key={p.id} product={p} />
           ))}
         </HorizontalScroll>
       </section>
 
       {/* Shop by Concern */}
       <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '36px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }} className="concern-container">
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '28px', textAlign: 'center' }}>
             Shop by Concern
           </h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: '16px',
-          }}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(5, 1fr)',
+              gap: '12px',
+            }}
             className="concern-grid"
           >
             {concerns.map((c) => (
@@ -237,8 +253,8 @@ export default function Home() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '12px',
-                  padding: '28px 16px',
+                  gap: '10px',
+                  padding: '20px 12px',
                   border: '1px solid var(--border)',
                   transition: 'background 0.2s, border-color 0.2s',
                   backgroundColor: 'var(--bg)',
@@ -252,39 +268,39 @@ export default function Home() {
                   e.currentTarget.style.borderColor = 'var(--border)'
                 }}
               >
-                <span style={{ fontSize: '28px', lineHeight: 1 }}>{c.icon}</span>
-                <span style={{ fontSize: '13px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{c.label}</span>
+                <span style={{ fontSize: '26px', lineHeight: 1 }}>{c.icon}</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.04em', textTransform: 'uppercase', textAlign: 'center' }}>{c.label}</span>
               </Link>
             ))}
           </div>
         </div>
         <style>{`
-          @media (max-width: 768px) {
+          @media (max-width: 900px) {
             .concern-grid { grid-template-columns: repeat(3, 1fr) !important; }
-            .hero-grid { grid-template-columns: 1fr !important; }
-            .hero-image { display: none !important; }
+            .concern-container { padding: 0 16px !important; }
+          }
+          @media (max-width: 480px) {
+            .concern-grid { grid-template-columns: repeat(2, 1fr) !important; }
           }
         `}</style>
       </section>
 
       {/* New Arrivals */}
-      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '72px', paddingBottom: '72px' }}>
+      <section style={{ backgroundColor: 'var(--bg-alt)', paddingTop: '48px', paddingBottom: '48px' }}>
         <HorizontalScroll title="New Arrivals">
           {newArrivals.map((p) => (
-            <div key={p.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
-              <ProductCard product={p} />
-            </div>
+            <ProductCard key={p.id} product={p} />
           ))}
         </HorizontalScroll>
       </section>
 
       {/* DIGITAL CAROUSEL AD SLOT LOOP (PURE TYPOGRAPHIC BILLBOARD) */}
       <section style={{ backgroundColor: 'var(--bg)' }} className="section-pad">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }} className="ad-container">
           <div style={{
             position: 'relative',
             width: '100%',
-            minHeight: '260px',
+            minHeight: '240px',
             borderRadius: '2px',
             overflow: 'hidden',
             backgroundColor: '#111',
@@ -293,7 +309,7 @@ export default function Home() {
             justifyContent: 'center',
             textAlign: 'center',
             boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-          }}>
+          }} className="ad-billboard">
             {/* Absolute container for smooth overlay crossfading */}
             {adSlides.map((slide, idx) => {
               const isActive = idx === currentAdSlide
@@ -315,13 +331,13 @@ export default function Home() {
                     color: '#fff',
                   }}
                 >
-                  <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px', fontWeight: 600 }}>
+                  <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: '10px', fontWeight: 600 }}>
                     {slide.tagline}
                   </span>
-                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 500, marginBottom: '16px', lineHeight: 1.2, maxWidth: '800px' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(20px, 4vw, 36px)', fontWeight: 500, marginBottom: '12px', lineHeight: 1.2, maxWidth: '800px' }}>
                     {slide.title}
                   </h3>
-                  <p style={{ fontSize: '15px', color: '#ccc', lineHeight: 1.6, marginBottom: '28px', maxWidth: '600px' }}>
+                  <p className="ad-desc" style={{ fontSize: '14px', color: '#ccc', lineHeight: 1.6, marginBottom: '22px', maxWidth: '600px' }}>
                     {slide.desc}
                   </p>
                   <div>
@@ -329,8 +345,8 @@ export default function Home() {
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      height: '42px',
-                      padding: '0 32px',
+                      height: '44px',
+                      padding: '0 28px',
                       backgroundColor: 'var(--white)',
                       color: '#111',
                       fontFamily: 'DM Sans, sans-serif',
@@ -348,18 +364,18 @@ export default function Home() {
               )
             })}
 
-            {/* Loop progress indicators / click handles centered at bottom */}
-            <div style={{ position: 'absolute', bottom: '20px', display: 'flex', gap: '8px', zIndex: 10 }}>
+            {/* Loop progress indicators */}
+            <div style={{ position: 'absolute', bottom: '16px', display: 'flex', gap: '8px', zIndex: 10 }}>
               {adSlides.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentAdSlide(idx)}
                   style={{
-                    width: '40px',
+                    width: '32px',
                     height: '3px',
                     padding: 0,
                     border: 'none',
-                    backgroundColor: idx === currentAdSlide ? 'var(--accent)' : 'rgba(255,255,255,0.25)',
+                    backgroundColor: idx === currentAdSlide ? 'var(--white)' : 'rgba(255,255,255,0.25)',
                     cursor: 'pointer',
                     transition: 'background-color 0.3s',
                   }}
@@ -369,38 +385,46 @@ export default function Home() {
             </div>
           </div>
         </div>
+        <style>{`
+          @media (max-width: 900px) {
+            .ad-container { padding: 0 16px !important; }
+            .ad-billboard { min-height: 200px !important; }
+            .ad-desc { display: none !important; }
+          }
+        `}</style>
       </section>
 
       {/* Bundles & Kits */}
       <section style={{ backgroundColor: 'var(--bg-alt)' }} className="section-pad">
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '36px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }} className="bundles-container">
+          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', marginBottom: '28px' }} className="bundles-title">
             Bundles &amp; Kits
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }} className="bundles-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }} className="bundles-grid">
             {bundles.map((b) => (
-              <div key={b.name} style={{ border: '1px solid var(--border)', backgroundColor: 'var(--bg)' }}>
-                {/* IMAGE SLOT */}
-                <div style={{ aspectRatio: '4 / 3', background: '#e8e4df', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div key={b.name} style={{ border: '1px solid var(--border)', backgroundColor: 'var(--bg)', overflow: 'hidden' }}>
+                {/* IMAGE */}
+                <div style={{ aspectRatio: '4 / 3', background: '#e8e4df', overflow: 'hidden' }}>
                   {b.image ? (
-                    <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={b.image} alt={b.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   ) : (
-                    <span style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Image Slot</span>
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: '11px', color: '#bbb', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Image Slot</span>
+                    </div>
                   )}
                 </div>
-                <div style={{ padding: '20px' }}>
-                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', marginBottom: '6px' }}>{b.name}</h3>
-                  <p style={{ fontSize: '13px', color: 'var(--text-light)', marginBottom: '12px' }}>{b.desc}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                <div style={{ padding: '16px' }}>
+                  <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '17px', marginBottom: '4px' }}>{b.name}</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--text-light)', marginBottom: '10px' }}>{b.desc}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
                     <span style={{ fontSize: '16px', fontWeight: 600 }}>{b.price}</span>
                     <span style={{ fontSize: '13px', color: 'var(--text-light)', textDecoration: 'line-through' }}>{b.original}</span>
                   </div>
                   <Link to="/products" style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '40px',
-                    padding: '0 20px',
+                    display: 'block',
+                    textAlign: 'center',
+                    height: '44px',
+                    lineHeight: '44px',
                     backgroundColor: 'var(--accent)',
                     color: 'var(--white)',
                     fontFamily: 'DM Sans, sans-serif',
@@ -416,7 +440,16 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <style>{`@media (max-width: 768px) { .bundles-grid { grid-template-columns: 1fr !important; } }`}</style>
+        <style>{`
+          @media (max-width: 900px) {
+            .bundles-grid { grid-template-columns: 1fr 1fr !important; gap: 16px !important; }
+            .bundles-container { padding: 0 16px !important; }
+            .bundles-title { font-size: 24px !important; margin-bottom: 20px !important; }
+          }
+          @media (max-width: 600px) {
+            .bundles-grid { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
       </section>
 
       {/* Trust Bar */}

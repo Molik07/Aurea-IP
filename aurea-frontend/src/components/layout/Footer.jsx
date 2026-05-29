@@ -34,10 +34,10 @@ export default function Footer() {
         style={{
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '64px 24px 40px',
+          padding: '48px 24px 32px',
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '48px',
+          gap: '40px',
         }}
         className="footer-grid"
       >
@@ -155,10 +155,10 @@ export default function Footer() {
 
       <style>{`
         @media (max-width: 768px) {
-          .footer-grid { grid-template-columns: 1fr 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; padding: 32px 20px 24px !important; }
         }
         @media (max-width: 480px) {
-          .footer-grid { grid-template-columns: 1fr !important; }
+          .footer-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
         }
       `}</style>
     </footer>

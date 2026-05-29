@@ -6,7 +6,7 @@ export default function AdminProducts() {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts()
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', brand: '', category: '', price: '', description: '', images: [] })
+  const [form, setForm] = useState({ name: '', brand: '', category: '', price: '', discountPrice: '', description: '', images: [] })
   const [editingId, setEditingId] = useState(null)
   const [categoriesList, setCategoriesList] = useState([])
 
@@ -29,12 +29,12 @@ export default function AdminProducts() {
   const handleSave = (e) => {
     e.preventDefault()
     if (editingId) {
-      updateProduct(editingId, { ...form, price: parseInt(form.price) })
+      updateProduct(editingId, { ...form, price: parseInt(form.price), discountPrice: form.discountPrice ? parseInt(form.discountPrice) : null })
     } else {
-      const newProduct = { ...form, id: `new-${Date.now()}`, price: parseInt(form.price), discountPrice: null, rating: 5, reviewCount: 0, shadeCount: 0, concerns: [], skinTypes: [], shades: [], ingredients: '', howToUse: '' }
+      const newProduct = { ...form, id: `new-${Date.now()}`, price: parseInt(form.price), discountPrice: form.discountPrice ? parseInt(form.discountPrice) : null, rating: 5, reviewCount: 0, shadeCount: 0, concerns: [], skinTypes: [], shades: [], ingredients: '', howToUse: '' }
       addProduct(newProduct)
     }
-    setForm({ name: '', brand: '', category: '', price: '', description: '', images: [] })
+    setForm({ name: '', brand: '', category: '', price: '', discountPrice: '', description: '', images: [] })
     setEditingId(null)
     setShowForm(false)
   }
@@ -45,6 +45,7 @@ export default function AdminProducts() {
       brand: product.brand || '',
       category: product.category || '',
       price: product.price || '',
+      discountPrice: product.discountPrice || '',
       description: product.description || '',
       images: product.images || (product.image ? [product.image] : [])
     })
@@ -103,7 +104,7 @@ export default function AdminProducts() {
             <Link to="/admin" style={{ fontSize: '13px', color: 'var(--text-light)', textDecoration: 'none' }}>← Dashboard</Link>
             <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', fontWeight: 500 }}>Products</h1>
           </div>
-          <button onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: '', brand: '', category: '', price: '', description: '', images: [] }) }} style={{ height: '40px', padding: '0 20px', background: 'var(--accent)', color: 'var(--white)', border: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          <button onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: '', brand: '', category: '', price: '', discountPrice: '', description: '', images: [] }) }} style={{ height: '40px', padding: '0 20px', background: 'var(--accent)', color: 'var(--white)', border: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
             + Add Product
           </button>
         </div>
@@ -120,7 +121,8 @@ export default function AdminProducts() {
                 {categoriesList.map(c => <option key={c._id} value={c.name}>{c.name}</option>)}
               </select>
             </div>
-            <div><label style={lbl}>Price (₹)</label><input required type="number" value={form.price} onChange={set('price')} style={fieldStyle} /></div>
+            <div><label style={lbl}>Regular Price (₹)</label><input required type="number" value={form.price} onChange={set('price')} style={fieldStyle} /></div>
+            <div><label style={lbl}>Sale Price (₹) (Optional)</label><input type="number" value={form.discountPrice || ''} onChange={set('discountPrice')} style={fieldStyle} placeholder="Leave empty for no sale" /></div>
             <div style={{ gridColumn: '1/-1' }}><label style={lbl}>Description</label><textarea value={form.description} onChange={set('description')} style={{ ...fieldStyle, height: '80px', padding: '10px 12px', resize: 'vertical' }} /></div>
             <div style={{ gridColumn: '1/-1' }}>
               <label style={lbl}>Product Images</label>
@@ -162,7 +164,11 @@ export default function AdminProducts() {
                   <td style={td}>{p.name}</td>
                   <td style={td}>{p.brand}</td>
                   <td style={td}>{p.category}</td>
-                  <td style={td}>₹{p.discountPrice || p.price}</td>
+                  <td style={td}>
+                    {p.discountPrice ? (
+                      <span>₹{p.discountPrice} <span style={{ textDecoration: 'line-through', color: '#aaa', fontSize: '11px', marginLeft: '4px' }}>₹{p.price}</span></span>
+                    ) : `₹${p.price}`}
+                  </td>
                   <td style={td}>{'★'.repeat(Math.round(p.rating))} {p.rating}</td>
                   <td style={{ ...td, whiteSpace: 'nowrap' }}>
                     <button onClick={() => handleEdit(p)} style={{ fontSize: '13px', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', marginRight: '12px' }}>Edit</button>

@@ -27,8 +27,8 @@ export default function ProductDetail() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '55% 1fr', gap: '48px', marginBottom: '64px' }} className="pdp-grid">
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }} className="pdp-outer">
+        <div style={{ display: 'grid', gridTemplateColumns: '55% 1fr', gap: '40px', marginBottom: '56px' }} className="pdp-grid">
           {/* Gallery */}
           <div>
             {product.images && product.images.length > 0 ? (
@@ -93,8 +93,8 @@ export default function ProductDetail() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-              <button onClick={() => { addItem(product, selectedShade, qty); openCart() }} style={{ height: '48px', background: 'var(--accent)', color: 'var(--white)', border: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Add to Cart</button>
-              <button onClick={() => toggleItem(product.id)} style={{ height: '44px', background: 'transparent', color: 'var(--accent)', border: '1px solid var(--border)', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              <button onClick={() => { addItem(product, selectedShade, qty); openCart() }} style={{ height: '52px', background: 'var(--accent)', color: 'var(--white)', border: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Add to Cart</button>
+              <button onClick={() => toggleItem(product.id)} style={{ height: '48px', background: 'transparent', color: 'var(--accent)', border: '1px solid var(--border)', fontFamily: 'DM Sans, sans-serif', fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
                 {wishlisted ? '♥ Wishlisted' : '♡ Add to Wishlist'}
               </button>
             </div>
@@ -136,7 +136,12 @@ export default function ProductDetail() {
           </div>
         )}
       </div>
-      <style>{`@media (max-width: 768px) { .pdp-grid { grid-template-columns: 1fr !important; } }`}</style>
+      <style>{`
+        @media (max-width: 768px) {
+          .pdp-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
+          .pdp-outer { padding: 16px 16px 80px !important; }
+        }
+      `}</style>
     </main>
   )
 }

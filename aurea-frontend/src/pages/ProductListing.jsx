@@ -89,15 +89,15 @@ export default function ProductListing() {
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
       {/* Page header */}
-      <div style={{ borderBottom: '1px solid var(--border)', padding: '32px 0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '36px', fontWeight: 500, letterSpacing: '-0.02em' }}>
+      <div style={{ borderBottom: '1px solid var(--border)', padding: '24px 0' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>
+          <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 'clamp(24px, 5vw, 36px)', fontWeight: 500, letterSpacing: '-0.02em' }}>
             All Products
           </h1>
         </div>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }} className="plp-outer">
         <div style={{ display: 'flex', gap: '40px', paddingTop: '32px' }} className="plp-layout">
 
           {/* Sidebar (desktop) */}
@@ -114,7 +114,7 @@ export default function ProductListing() {
           {/* Main */}
           <div style={{ flex: 1 }}>
             {/* Toolbar */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '10px' }} className="plp-toolbar">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
                 <button
                   onClick={() => setDrawerOpen(true)}
@@ -213,8 +213,12 @@ export default function ProductListing() {
         @media (max-width: 768px) {
           .plp-sidebar { display: none !important; }
           .filter-btn-mobile { display: flex !important; }
-          .product-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .plp-layout { gap: 0 !important; }
+          .product-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+          .plp-layout { gap: 0 !important; padding-top: 16px !important; }
+          .plp-outer { padding: 0 12px !important; }
+          .plp-toolbar { margin-bottom: 16px !important; }
+          .plp-toolbar input { font-size: 16px !important; } /* Prevents iOS zoom */
+          .plp-toolbar select { font-size: 16px !important; }
         }
       `}</style>
     </main>
