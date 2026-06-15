@@ -5,6 +5,15 @@ import { isAuthenticated, isAdmin } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
+/**
+ * Escape special regex characters in user input to prevent ReDoS attacks.
+ * Without this, a crafted search string could cause exponential backtracking
+ * in MongoDB's regex engine and freeze the query.
+ */
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // GET /api/products - Fetch products with search, filters, and pagination
 router.get('/', async (req, res) => {
   try {
@@ -13,10 +22,11 @@ router.get('/', async (req, res) => {
     let query = { isActive: true };
 
     if (search) {
+      const safeSearch = escapeRegex(search);
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { brand: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 

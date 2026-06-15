@@ -8,6 +8,7 @@ import { validate } from '../middlewares/validate.middleware.js';
 import { isAuthenticated } from '../middlewares/auth.middleware.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../lib/jwt.js';
 import { sendVerificationEmail, sendWelcomeEmail } from '../lib/email.js';
+import { authLimiter } from '../middlewares/rateLimiter.middleware.js';
 import crypto from 'crypto';
 
 const router = Router();
@@ -59,7 +60,7 @@ function checkOtpRateLimit(email) {
 }
 
 // POST /api/auth/send-otp
-router.post('/send-otp', validate(sendOtpSchema), asyncHandler(async (req, res) => {
+router.post('/send-otp', authLimiter, validate(sendOtpSchema), asyncHandler(async (req, res) => {
   const { email, name } = req.body;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -135,7 +136,7 @@ router.post('/resend-otp', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/auth/register
-router.post('/register', validate(registerSchema), asyncHandler(async (req, res) => {
+router.post('/register', authLimiter, validate(registerSchema), asyncHandler(async (req, res) => {
   const { name, email, password, otp } = req.body;
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -198,7 +199,7 @@ router.post('/register', validate(registerSchema), asyncHandler(async (req, res)
 }));
 
 // POST /api/auth/login
-router.post('/login', validate(loginSchema), asyncHandler(async (req, res) => {
+router.post('/login', authLimiter, validate(loginSchema), asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await prisma.user.findUnique({ where: { email } });
@@ -267,7 +268,7 @@ router.post('/login-otp', asyncHandler(async (req, res) => {
 }));
 
 // POST /api/auth/verify-login-otp (Verify OTP and log in)
-router.post('/verify-login-otp', asyncHandler(async (req, res) => {
+router.post('/verify-login-otp', authLimiter, asyncHandler(async (req, res) => {
   const { email, otp } = req.body;
 
   const user = await prisma.user.findUnique({ where: { email } });

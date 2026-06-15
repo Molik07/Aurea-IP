@@ -47,7 +47,7 @@ export const CLOUDINARY_API_KEY = optional_env('CLOUDINARY_API_KEY');
 export const CLOUDINARY_API_SECRET = optional_env('CLOUDINARY_API_SECRET');
 
 // ─── JWT ──────────────────────────────────────────────────────────────────────
-export const JWT_SECRET = optional_env('JWT_SECRET', 'fallback_access_secret');
-export const JWT_REFRESH_SECRET = optional_env('JWT_REFRESH_SECRET', 'fallback_refresh_secret');
+export const JWT_SECRET = require_env('JWT_SECRET');
+export const JWT_REFRESH_SECRET = require_env('JWT_REFRESH_SECRET');
 export const JWT_ACCESS_EXPIRATION = optional_env('JWT_ACCESS_EXPIRATION', '15m');
 export const JWT_REFRESH_EXPIRATION = optional_env('JWT_REFRESH_EXPIRATION', '7d');

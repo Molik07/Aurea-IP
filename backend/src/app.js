@@ -2,9 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import { NODE_ENV, FRONTEND_URL } from './config/index.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import { ApiError } from './utils/ApiError.js';
+import { globalLimiter } from './middlewares/rateLimiter.middleware.js';
 import cartRoutes from './routes/cart.routes.js';
 import wishlistRoutes from './routes/wishlist.routes.js';
 import productRoutes from './routes/product.routes.js';
@@ -15,15 +17,30 @@ import categoryRoutes from './routes/category.routes.js';
 
 const app = express();
 
+// ─── Security Headers ─────────────────────────────────────────────────────────
+app.use(helmet());
+
 // ─── CORS ─────────────────────────────────────────────────────────────────────
+const allowedOrigins = NODE_ENV === 'production'
+  ? [FRONTEND_URL]
+  : [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'];
+
 app.use(
   cors({
-    origin: (origin, callback) => callback(null, true), // Reflect origin in dev
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., mobile apps, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: Origin ${origin} not allowed`));
+    },
     credentials: true, // Allow cookies (refresh tokens)
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id'],
   })
 );
+
+// ─── Rate Limiting ────────────────────────────────────────────────────────────
+app.use('/api/', globalLimiter);
 
 // ─── Request Logging ──────────────────────────────────────────────────────────
 app.use(morgan(NODE_ENV === 'production' ? 'combined' : 'dev'));
