@@ -1,6 +1,14 @@
+/**
+ * ProductListing — Product listing page (PLP) with server-side filtering.
+ *
+ * Features: search, category/skin-type/concern filtering, sort, pagination.
+ * Filters are managed locally and synced to URL search params.
+ * Mobile filter drawer with Framer Motion animation.
+ */
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ProductCard from '../components/ui/ProductCard'
+import SEOHead from '../components/ui/SEOHead'
 const SKIN_TYPES = ['Oily', 'Dry', 'Combination', 'Sensitive', 'Normal']
 const CONCERNS = ['Acne', 'Hydration', 'Brightening', 'Anti-Aging', 'SPF']
 const SORT_OPTIONS = [
@@ -88,6 +96,7 @@ export default function ProductListing() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <SEOHead title="Shop All Products" description="Browse Aurea's full range of science-backed skincare. Filter by skin type, concern, and more." />
       {/* Page header */}
       <div style={{ borderBottom: '1px solid var(--border)', padding: '24px 0' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px' }}>

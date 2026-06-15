@@ -1,12 +1,29 @@
+/**
+ * Footer — Site-wide footer with brand info, navigation, and newsletter.
+ *
+ * Sections:
+ * - Brand column: Logo + tagline
+ * - Shop links: Product category navigation
+ * - Help links: Customer service pages
+ * - Newsletter: Email subscription with honeypot spam protection
+ *
+ * Responsive:
+ * - Desktop: 4-column grid
+ * - Tablet (≤768px): 2-column grid
+ * - Mobile (≤480px): Single column
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function Footer() {
   const [email, setEmail] = useState('')
+  const [honeypot, setHoneypot] = useState('') // Hidden field for spam bots
   const [subscribed, setSubscribed] = useState(false)
 
   const handleSubscribe = (e) => {
     e.preventDefault()
+    // If honeypot is filled, silently reject (bot submission)
+    if (honeypot) return
     if (email) {
       setSubscribed(true)
       setEmail('')
@@ -29,7 +46,7 @@ export default function Footer() {
   }
 
   return (
-    <footer style={{ backgroundColor: 'var(--accent)', color: 'var(--white)' }}>
+    <footer style={{ backgroundColor: 'var(--accent)', color: 'var(--white)' }} role="contentinfo">
       <div
         style={{
           maxWidth: '1200px',
@@ -72,12 +89,18 @@ export default function Footer() {
         {/* Help */}
         <div style={col}>
           <span style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '4px' }}>Help</span>
-          {['Contact Us', 'Shipping Policy', 'Returns & Exchanges', 'FAQ', 'Track Order'].map((label) => (
-            <span key={label} style={linkStyle}
+          {[
+            { label: 'Contact Us', path: '#' },
+            { label: 'Shipping Policy', path: '#' },
+            { label: 'Returns & Exchanges', path: '#' },
+            { label: 'FAQ', path: '#' },
+            { label: 'Track Order', path: '#' },
+          ].map((l) => (
+            <Link key={l.label} to={l.path} style={linkStyle}
               onMouseEnter={(e) => (e.target.style.color = '#fff')}
               onMouseLeave={(e) => (e.target.style.color = 'rgba(255,255,255,0.65)')}>
-              {label}
-            </span>
+              {l.label}
+            </Link>
           ))}
         </div>
 
@@ -88,15 +111,18 @@ export default function Footer() {
             New arrivals, skincare tips, and exclusive offers — directly to you.
           </p>
           {subscribed ? (
-            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)' }}>You're in! ✨</p>
+            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.85)' }} role="status">You're in! ✨</p>
           ) : (
             <form onSubmit={handleSubscribe} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+              <label htmlFor="footer-email" className="sr-only">Email address</label>
               <input
+                id="footer-email"
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
                 style={{
                   padding: '10px 14px',
                   background: 'rgba(255,255,255,0.08)',
@@ -106,6 +132,17 @@ export default function Footer() {
                   fontSize: '14px',
                   outline: 'none',
                 }}
+              />
+              {/* Honeypot field — hidden from users, catches spam bots */}
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
               />
               <button
                 type="submit"
@@ -144,11 +181,13 @@ export default function Footer() {
         }}
       >
         <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-          © 2026 Aurea. All rights reserved.
+          © {new Date().getFullYear()} Aurea. All rights reserved.
         </p>
         <div style={{ display: 'flex', gap: '20px' }}>
           {['Privacy Policy', 'Terms of Use'].map((l) => (
-            <span key={l} style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer' }}>{l}</span>
+            <Link key={l} to="#" style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', textDecoration: 'none' }}>
+              {l}
+            </Link>
           ))}
         </div>
       </div>

@@ -1,3 +1,10 @@
+/**
+ * ProductDetail — Product detail page (PDP).
+ *
+ * Displays full product info: image gallery, pricing, shade selector,
+ * quantity picker, add-to-cart, wishlist, reviews, and related products.
+ * Uses Cloudinary transforms for optimized image delivery.
+ */
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { mockReviews } from '../data/mockReviews'
@@ -9,6 +16,7 @@ import HorizontalScroll from '../components/ui/HorizontalScroll'
 import ProductCard from '../components/ui/ProductCard'
 import useCart from '../hooks/useCart'
 import useWishlist from '../hooks/useWishlist'
+import SEOHead from '../components/ui/SEOHead'
 
 export default function ProductDetail() {
   const { id } = useParams()
@@ -27,6 +35,11 @@ export default function ProductDetail() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)' }}>
+      <SEOHead
+        title={product.name}
+        description={`${product.name} by ${product.brand}. ${product.description ? product.description.slice(0, 150) : 'Shop now at Aurea.'}`}
+        ogType="product"
+      />
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }} className="pdp-outer">
         <div style={{ display: 'grid', gridTemplateColumns: '55% 1fr', gap: '40px', marginBottom: '56px' }} className="pdp-grid">
           {/* Gallery */}
@@ -36,15 +49,17 @@ export default function ProductDetail() {
                 <div style={{ aspectRatio: '3/4', background: '#e8e4df', marginBottom: '12px' }}>
                   <img 
                     src={product.images[selectedThumb] ? (product.images[selectedThumb].includes('/upload/') ? product.images[selectedThumb].replace('/upload/', '/upload/w_1000,q_auto,f_auto/') : product.images[selectedThumb]) : ''} 
-                    alt={product.name} 
+                    alt={`${product.name} by ${product.brand} — image ${selectedThumb + 1}`}
+                    width="1000"
+                    height="1333"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   />
                 </div>
                 {product.images.length > 1 && (
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {product.images.map((img, i) => (
-                      <button key={i} onClick={() => setSelectedThumb(i)} style={{ flex: 1, aspectRatio: '1', background: '#e8e4df', border: selectedThumb === i ? '1px solid var(--accent)' : '1px solid transparent', cursor: 'pointer', padding: 0 }}>
-                        <img src={img.includes('/upload/') ? img.replace('/upload/', '/upload/w_200,q_auto,f_auto/') : img} alt={`${product.name} thumbnail`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <button key={i} onClick={() => setSelectedThumb(i)} aria-label={`View image ${i + 1} of ${product.images.length}`} style={{ flex: 1, aspectRatio: '1', background: '#e8e4df', border: selectedThumb === i ? '1px solid var(--accent)' : '1px solid transparent', cursor: 'pointer', padding: 0 }}>
+                        <img src={img.includes('/upload/') ? img.replace('/upload/', '/upload/w_200,q_auto,f_auto/') : img} alt={`${product.name} — thumbnail ${i + 1}`} width="200" height="200" loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </button>
                     ))}
                   </div>

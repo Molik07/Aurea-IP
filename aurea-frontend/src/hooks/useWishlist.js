@@ -7,7 +7,7 @@ const getUserId = () => {
 
   let id = localStorage.getItem('aurea-guest-id')
   if (!id) {
-    id = 'guest_' + Math.random().toString(36).substr(2, 9)
+    id = 'guest_' + crypto.randomUUID()
     localStorage.setItem('aurea-guest-id', id)
   }
   return id

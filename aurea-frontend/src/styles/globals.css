@@ -1,18 +1,48 @@
+/**
+ * ─── Aurea Design System — Global Styles ─────────────────────────────────────
+ *
+ * Design tokens, resets, utility classes, and responsive foundations for the
+ * Aurea skincare e-commerce platform.
+ *
+ * Typography:
+ *   - Display/Headings: Playfair Display (serif)
+ *   - Body/UI: DM Sans (sans-serif)
+ *
+ * Color palette:
+ *   - --bg:         Primary background (warm off-white)
+ *   - --bg-alt:     Alternating section background
+ *   - --text:       Primary text color (near-black)
+ *   - --text-mid:   Secondary text color
+ *   - --text-light: Tertiary/caption text (WCAG AA compliant)
+ *   - --border:     Subtle border/divider color
+ *   - --accent:     CTA/interactive color (dark)
+ *   - --white:      Pure white for contrast on dark backgrounds
+ *
+ * Breakpoints:
+ *   - 900px: Tablet landscape / desktop transition
+ *   - 768px: Tablet portrait / mobile transition
+ *   - 480px: Small mobile
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 @import "tailwindcss";
 
+/* ─── Design Tokens ────────────────────────────────────────────────────────── */
 :root {
   --bg:         #f7f5f2;
   --bg-alt:     #f0ede8;
   --text:       #1a1a1a;
   --text-mid:   #555555;
-  --text-light: #999999;
+  --text-light: #717171; /* Darkened from #999 → #717171 for WCAG AA 4.5:1 contrast on --bg */
   --border:     #e0dbd4;
   --accent:     #1a1a1a;
   --white:      #ffffff;
+  --focus-ring: rgba(26, 26, 26, 0.35);
 }
 
+/* ─── Reset ────────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -24,6 +54,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Offset sticky header on anchor jumps */
 }
 
 body {
@@ -57,6 +89,17 @@ input, textarea, select {
   font-size: inherit;
 }
 
+/* ─── Focus Visible — Keyboard-only focus ring ─────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ─── Utilities ────────────────────────────────────────────────────────────── */
 .font-display {
   font-family: 'Playfair Display', serif;
 }
@@ -153,4 +196,17 @@ input, textarea, select {
     width: calc(50vw - 24px);
     min-width: 140px;
   }
+}
+
+/* ─── Screen-reader only utility ─── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

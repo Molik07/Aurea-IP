@@ -1,7 +1,18 @@
+/**
+ * Auth — Authentication page (login and registration).
+ *
+ * Multi-step flow:
+ * - Login: email + password, or passwordless OTP
+ * - Register: name + email → OTP verification → set password
+ *
+ * Uses glassmorphism card design with Framer Motion transitions.
+ * Marked noindex for SEO.
+ */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuth from '../hooks/useAuth';
+import SEOHead from '../components/ui/SEOHead';
 
 // ─── OTP Input Component ───────────────────────────────────────────────────────
 function OtpInput({ value, onChange, disabled }) {
@@ -385,6 +396,9 @@ export default function Auth() {
         overflow: 'hidden',
       }}
     >
+      {/* SEO */}
+      <SEOHead title="Sign In" noIndex />
+
       {/* Decorative ambient glows */}
       <div style={{ position: 'absolute', top: '-5%', left: '15%', width: '480px', height: '480px', background: 'radial-gradient(circle, rgba(176,138,110,0.12) 0%, transparent 70%)', zIndex: 0, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '-10%', right: '10%', width: '560px', height: '560px', background: 'radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%)', zIndex: 0, pointerEvents: 'none' }} />

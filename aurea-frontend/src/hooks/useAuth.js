@@ -14,6 +14,7 @@ const useAuth = create((set) => ({
       const response = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
@@ -72,6 +73,7 @@ const useAuth = create((set) => ({
       const response = await fetch(`${API_BASE}/verify-login-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, otp }),
       });
       const data = await response.json();
@@ -110,6 +112,7 @@ const useAuth = create((set) => ({
       const response = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(userData),
       });
       const data = await response.json();
@@ -126,7 +129,7 @@ const useAuth = create((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await fetch(`${API_BASE}/logout`, { method: 'POST' });
+      await fetch(`${API_BASE}/logout`, { method: 'POST', credentials: 'include' });
       localStorage.removeItem('accessToken');
       set({ user: null, isLoading: false });
     } catch (error) {

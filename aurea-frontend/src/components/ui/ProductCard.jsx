@@ -1,8 +1,27 @@
+/**
+ * ProductCard — Product listing card with image hover, wishlist toggle, and pricing.
+ *
+ * Features:
+ * - Image hover crossfade between primary and secondary product images
+ * - Cloudinary URL optimization (w_600, q_auto, f_auto transforms)
+ * - Lazy loading and async decoding for performance
+ * - Explicit width/height to prevent CLS (Cumulative Layout Shift)
+ * - Wishlist toggle with heart icon
+ * - Sale badge for discounted products
+ * - Star rating and review count
+ * - Shade count indicator
+ *
+ * @param {Object} product - Product data object from the products store
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import StarRating from './StarRating'
 import useWishlist from '../../hooks/useWishlist'
 
+/**
+ * Optimize Cloudinary image URLs with resize and quality transforms.
+ * Leaves non-Cloudinary URLs untouched.
+ */
 function optimizeImage(url) {
   if (typeof url === 'string' && url.includes('cloudinary.com') && url.includes('/upload/')) {
     return url.replace('/upload/', '/upload/w_600,q_auto,f_auto/')
@@ -28,9 +47,25 @@ export default function ProductCard({ product }) {
       <div style={{ position: 'relative', aspectRatio: '1 / 1', overflow: 'hidden', background: '#e8e4df' }}>
         {product.images && product.images.length > 0 ? (
           <>
-            <img src={optimizeImage(product.images[0])} alt={product.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.4s ease', opacity: hovered && product.images.length > 1 ? 0 : 1 }} />
+            <img
+              src={optimizeImage(product.images[0])}
+              alt={`${product.name} by ${product.brand}`}
+              width="600"
+              height="600"
+              loading="lazy"
+              decoding="async"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.4s ease', opacity: hovered && product.images.length > 1 ? 0 : 1 }}
+            />
             {product.images[1] && (
-              <img src={optimizeImage(product.images[1])} alt={product.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.4s ease', opacity: hovered ? 1 : 0 }} />
+              <img
+                src={optimizeImage(product.images[1])}
+                alt={`${product.name} — alternate view`}
+                width="600"
+                height="600"
+                loading="lazy"
+                decoding="async"
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transition: 'opacity 0.4s ease', opacity: hovered ? 1 : 0 }}
+              />
             )}
           </>
         ) : (
@@ -62,26 +97,29 @@ export default function ProductCard({ product }) {
             borderRadius: '50%',
             boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
           }}
-          aria-label="Add to wishlist"
+          aria-label={wishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
         >
           <HeartIcon filled={wishlisted} />
         </button>
 
         {/* Discount badge */}
         {discounted && (
-          <span style={{
-            position: 'absolute',
-            top: '10px',
-            left: '10px',
-            background: 'var(--accent)',
-            color: 'var(--white)',
-            fontSize: '10px',
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            padding: '3px 8px',
-            textTransform: 'uppercase',
-            zIndex: 2,
-          }}>
+          <span
+            aria-label={`${Math.round((1 - product.discountPrice / product.price) * 100)}% off`}
+            style={{
+              position: 'absolute',
+              top: '10px',
+              left: '10px',
+              background: 'var(--accent)',
+              color: 'var(--white)',
+              fontSize: '10px',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              padding: '3px 8px',
+              textTransform: 'uppercase',
+              zIndex: 2,
+            }}
+          >
             Sale
           </span>
         )}
@@ -116,9 +154,10 @@ export default function ProductCard({ product }) {
   )
 }
 
+/** Heart icon with filled/unfilled state for wishlist toggle */
 function HeartIcon({ filled }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   )

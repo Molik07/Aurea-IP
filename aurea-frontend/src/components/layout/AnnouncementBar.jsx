@@ -1,3 +1,12 @@
+/**
+ * AnnouncementBar — Rotating promotional banner.
+ *
+ * Displays a cycling set of promotional messages in the top announcement bar
+ * with a smooth fade transition. Uses aria-live="polite" so screen readers
+ * announce new messages without interrupting the user.
+ *
+ * Timing: 3.5s interval, 0.3s fade transition.
+ */
 import { useState, useEffect } from 'react'
 
 const messages = [
@@ -24,6 +33,8 @@ export default function AnnouncementBar() {
 
   return (
     <div
+      role="banner"
+      aria-label="Promotional announcements"
       style={{
         backgroundColor: 'var(--accent)',
         color: 'var(--white)',
@@ -34,6 +45,8 @@ export default function AnnouncementBar() {
       }}
     >
       <p
+        aria-live="polite"
+        aria-atomic="true"
         style={{
           fontFamily: 'DM Sans, sans-serif',
           fontSize: '12px',

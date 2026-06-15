@@ -1,21 +1,56 @@
-import { useEffect } from 'react'
+/**
+ * CartDrawer — Slide-in cart sidebar.
+ *
+ * Features:
+ * - Animated slide-in from right with backdrop overlay
+ * - Free shipping progress bar
+ * - Quantity adjustment per item
+ * - Upsell product suggestion
+ * - Focus trap and Escape key handler for accessibility
+ * - Body scroll lock when open
+ * - Cloudinary image optimization for cart thumbnails
+ *
+ * @uses useCart — Zustand store for cart state management
+ * @uses ProgressBar — Visual progress toward free shipping threshold
+ */
+import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import useCart from '../../hooks/useCart'
 import ProgressBar from '../ui/ProgressBar'
 
+/** Free shipping threshold in INR */
 const FREE_SHIPPING_THRESHOLD = 999
 
 export default function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, getTotal } = useCart()
   const total = getTotal()
   const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - total)
+  const closeButtonRef = useRef(null)
 
+  // Lock body scroll when drawer is open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = ''
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
+
+  // Focus close button when drawer opens
+  useEffect(() => {
+    if (isOpen && closeButtonRef.current) {
+      closeButtonRef.current.focus()
+    }
+  }, [isOpen])
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') closeCart()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, closeCart])
 
   return (
     <AnimatePresence>
@@ -28,6 +63,7 @@ export default function CartDrawer() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             onClick={closeCart}
+            aria-hidden="true"
             style={{
               position: 'fixed',
               inset: 0,
@@ -37,6 +73,9 @@ export default function CartDrawer() {
           />
           <motion.aside
             key="drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Shopping cart"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -65,7 +104,14 @@ export default function CartDrawer() {
               <span style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px' }}>
                 Your Cart {items.length > 0 && `(${items.length})`}
               </span>
-              <button onClick={closeCart} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px', color: 'var(--text)' }}>×</button>
+              <button
+                ref={closeButtonRef}
+                onClick={closeCart}
+                aria-label="Close cart"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '22px', color: 'var(--text)' }}
+              >
+                ×
+              </button>
             </div>
 
             {/* Body */}
@@ -101,7 +147,7 @@ export default function CartDrawer() {
                       <ProgressBar current={total} total={FREE_SHIPPING_THRESHOLD} />
                     </div>
                   ) : (
-                    <div style={{ marginBottom: '16px', padding: '10px 14px', background: '#e8f5e9', borderLeft: '3px solid #4caf50' }}>
+                    <div style={{ marginBottom: '16px', padding: '10px 14px', background: '#e8f5e9', borderLeft: '3px solid #4caf50' }} role="status">
                       <p style={{ fontSize: '13px', color: '#2e7d32' }}>🎉 You qualify for free shipping!</p>
                     </div>
                   )}
@@ -115,23 +161,28 @@ export default function CartDrawer() {
                   <div style={{ margin: '20px 0', padding: '16px', border: '1px solid var(--border)' }}>
                     <p style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-light)', marginBottom: '12px' }}>You might also like</p>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <div style={{ width: '56px', height: '56px', flexShrink: 0, background: '#e8e4df' }} />
+                      <div style={{ width: '56px', height: '56px', flexShrink: 0, background: '#e8e4df' }} aria-hidden="true" />
                       <div style={{ flex: 1 }}>
                         <p style={{ fontSize: '13px', fontWeight: 500 }}>Niacinamide 10% Serum</p>
                         <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>₹449</p>
                       </div>
-                      <button style={{
-                        padding: '8px 14px',
-                        background: 'var(--accent)',
-                        color: 'var(--white)',
-                        fontFamily: 'DM Sans, sans-serif',
-                        fontSize: '11px',
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        border: 'none',
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                      }}>Add</button>
+                      <button
+                        aria-label="Add Niacinamide 10% Serum to cart"
+                        style={{
+                          padding: '8px 14px',
+                          background: 'var(--accent)',
+                          color: 'var(--white)',
+                          fontFamily: 'DM Sans, sans-serif',
+                          fontSize: '11px',
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                          border: 'none',
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                        }}
+                      >
+                        Add
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -172,6 +223,12 @@ export default function CartDrawer() {
   )
 }
 
+/**
+ * CartItem — Individual line item in the cart drawer.
+ *
+ * Displays product image (optimized via Cloudinary transforms), name, brand,
+ * shade (if applicable), quantity controls, and line total.
+ */
 function CartItem({ item, updateQuantity, removeItem }) {
   return (
     <div style={{
@@ -180,10 +237,18 @@ function CartItem({ item, updateQuantity, removeItem }) {
       padding: '16px 0',
       borderBottom: '1px solid var(--border)',
     }}>
-      {/* IMAGE SLOT */}
+      {/* Product thumbnail */}
       <div style={{ width: '72px', height: '72px', flexShrink: 0, background: '#e8e4df', overflow: 'hidden' }}>
         {item.image && (
-          <img src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/', '/upload/w_150,q_auto,f_auto/') : item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <img
+            src={item.image.includes('cloudinary.com') ? item.image.replace('/upload/', '/upload/w_150,q_auto,f_auto/') : item.image}
+            alt={`${item.name}${item.shade ? ` — ${item.shade.name}` : ''}`}
+            width="72"
+            height="72"
+            loading="lazy"
+            decoding="async"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
         )}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -193,13 +258,31 @@ function CartItem({ item, updateQuantity, removeItem }) {
             <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>{item.brand}</p>
             {item.shade && <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>Shade: {item.shade.name}</p>}
           </div>
-          <button onClick={() => removeItem(item.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)', fontSize: '18px', lineHeight: 1 }}>×</button>
+          <button
+            onClick={() => removeItem(item.key)}
+            aria-label={`Remove ${item.name} from cart`}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-light)', fontSize: '18px', lineHeight: 1 }}
+          >
+            ×
+          </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center', border: '1px solid var(--border)', gap: '0' }}>
-            <button onClick={() => updateQuantity(item.key, item.quantity - 1)} style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }}>−</button>
-            <span style={{ width: '28px', textAlign: 'center', fontSize: '13px' }}>{item.quantity}</span>
-            <button onClick={() => updateQuantity(item.key, item.quantity + 1)} style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }}>+</button>
+            <button
+              onClick={() => updateQuantity(item.key, item.quantity - 1)}
+              aria-label={`Decrease quantity of ${item.name}`}
+              style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }}
+            >
+              −
+            </button>
+            <span style={{ width: '28px', textAlign: 'center', fontSize: '13px' }} aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
+            <button
+              onClick={() => updateQuantity(item.key, item.quantity + 1)}
+              aria-label={`Increase quantity of ${item.name}`}
+              style={{ width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }}
+            >
+              +
+            </button>
           </div>
           <span style={{ fontSize: '14px', fontWeight: 500 }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
         </div>

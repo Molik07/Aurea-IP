@@ -1,3 +1,10 @@
+/**
+ * Account — User account dashboard.
+ *
+ * Tabs: Overview, Orders, Addresses, Wishlist, Loyalty Points.
+ * Responsive: sidebar on desktop, horizontal tabs on mobile.
+ * Marked noindex for SEO.
+ */
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import useProducts from '../hooks/useProducts'
@@ -5,6 +12,7 @@ import ProductCard from '../components/ui/ProductCard'
 import useWishlist from '../hooks/useWishlist'
 import ProgressBar from '../components/ui/ProgressBar'
 import useAuth from '../hooks/useAuth'
+import SEOHead from '../components/ui/SEOHead'
 
 const TABS = ['Overview', 'Orders', 'Addresses', 'Wishlist', 'Loyalty Points']
 
@@ -44,6 +52,7 @@ export default function Account() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
+      <SEOHead title="My Account" noIndex />
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 24px' }}>
         <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: '32px', fontWeight: 500, marginBottom: '40px' }}>My Account</h1>
         <div style={{ display: 'flex', gap: '40px' }} className="account-layout">

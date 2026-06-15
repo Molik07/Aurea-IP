@@ -1,3 +1,17 @@
+/**
+ * App — Root component and route configuration.
+ *
+ * Responsibilities:
+ * - Initialize global state (cart, wishlist, products, settings, auth)
+ * - Define all application routes with authentication guards
+ * - Render persistent layout (AnnouncementBar, Header, Footer, CartDrawer)
+ * - Scroll-to-top on route change
+ * - Provide skip-to-content link for keyboard accessibility
+ *
+ * Route guards:
+ * - ProtectedRoute: requires authenticated user, redirects to /auth
+ * - AdminRoute: requires user.role === 'admin', redirects to /
+ */
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import useCart from './hooks/useCart'
@@ -9,6 +23,7 @@ import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import AnnouncementBar from './components/layout/AnnouncementBar'
 import CartDrawer from './components/layout/CartDrawer'
+import SkipToContent from './components/ui/SkipToContent'
 import Home from './pages/Home'
 import ProductListing from './pages/ProductListing'
 import ProductDetail from './pages/ProductDetail'
@@ -16,12 +31,17 @@ import Checkout from './pages/Checkout'
 import Account from './pages/Account'
 import Auth from './pages/Auth'
 import SkinQuiz from './pages/SkinQuiz'
+import NotFound from './pages/NotFound'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminCategories from './pages/admin/AdminCategories'
 
+/**
+ * ProtectedRoute — Guards routes that require authentication.
+ * Redirects unauthenticated users to /auth, preserving the intended destination.
+ */
 function ProtectedRoute({ children }) {
   const { user, isCheckingAuth } = useAuth();
   const location = useLocation();
@@ -35,6 +55,10 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+/**
+ * AdminRoute — Guards admin-only routes.
+ * Requires authenticated user with role === 'admin'.
+ */
 function AdminRoute({ children }) {
   const { user, isCheckingAuth } = useAuth();
   const location = useLocation();
@@ -52,6 +76,9 @@ function AdminRoute({ children }) {
   return children;
 }
 
+/**
+ * ScrollToTop — Scrolls to top on every route change.
+ */
 function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => {
@@ -77,38 +104,43 @@ export default function App() {
 
   return (
     <>
+      <SkipToContent />
       <ScrollToTop />
       <AnnouncementBar />
       <Header />
       <CartDrawer />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/products" element={<ProductListing />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/account" element={
-          <ProtectedRoute>
-            <Account />
-          </ProtectedRoute>
-        } />
-        <Route path="/quiz" element={<SkinQuiz />} />
-        <Route path="/admin" element={
-          <AdminRoute><AdminDashboard /></AdminRoute>
-        } />
-        <Route path="/admin/products" element={
-          <AdminRoute><AdminProducts /></AdminRoute>
-        } />
-        <Route path="/admin/categories" element={
-          <AdminRoute><AdminCategories /></AdminRoute>
-        } />
-        <Route path="/admin/orders" element={
-          <AdminRoute><AdminOrders /></AdminRoute>
-        } />
-        <Route path="/admin/settings" element={
-          <AdminRoute><AdminSettings /></AdminRoute>
-        } />
-      </Routes>
+      <div id="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductListing />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/account" element={
+            <ProtectedRoute>
+              <Account />
+            </ProtectedRoute>
+          } />
+          <Route path="/quiz" element={<SkinQuiz />} />
+          <Route path="/admin" element={
+            <AdminRoute><AdminDashboard /></AdminRoute>
+          } />
+          <Route path="/admin/products" element={
+            <AdminRoute><AdminProducts /></AdminRoute>
+          } />
+          <Route path="/admin/categories" element={
+            <AdminRoute><AdminCategories /></AdminRoute>
+          } />
+          <Route path="/admin/orders" element={
+            <AdminRoute><AdminOrders /></AdminRoute>
+          } />
+          <Route path="/admin/settings" element={
+            <AdminRoute><AdminSettings /></AdminRoute>
+          } />
+          {/* 404 catch-all — must be last */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
       <Footer />
     </>
   )

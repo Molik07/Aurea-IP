@@ -1,9 +1,20 @@
+/**
+ * StarRating — Visual star rating display with partial fill support.
+ *
+ * Renders 5 stars with gradient-based partial filling for decimal ratings
+ * (e.g., 4.3 shows the 5th star ~30% filled). Each star uses a unique
+ * linearGradient for the fill effect.
+ *
+ * @param {number}  rating  - Rating value (0–5, supports decimals)
+ * @param {number}  [count] - Number of reviews to display in parentheses
+ * @param {'default'|'small'} [size='default'] - Star size variant
+ */
 export default function StarRating({ rating, count, size = 'default' }) {
   const starSize = size === 'small' ? 12 : 14
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-      <div style={{ display: 'flex', gap: '2px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} aria-label={`Rating: ${rating} out of 5${count !== undefined ? `, ${count} reviews` : ''}`} role="img">
+      <div style={{ display: 'flex', gap: '2px' }} aria-hidden="true">
         {[1, 2, 3, 4, 5].map((n) => {
           const fill = Math.min(1, Math.max(0, rating - (n - 1)))
           return <Star key={n} fill={fill} size={starSize} />
@@ -18,6 +29,10 @@ export default function StarRating({ rating, count, size = 'default' }) {
   )
 }
 
+/**
+ * Star — Individual star with gradient partial fill.
+ * Uses a unique linearGradient ID per instance to avoid SVG conflicts.
+ */
 function Star({ fill, size }) {
   const id = `star-grad-${Math.random().toString(36).slice(2)}`
   return (

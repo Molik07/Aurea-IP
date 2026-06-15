@@ -1,8 +1,15 @@
+/**
+ * SkinQuiz — Interactive skin analysis quiz.
+ *
+ * 5-step questionnaire that recommends personalized products based on
+ * skin type, concerns, sensitivity, routine complexity, and age range.
+ */
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { mockProducts } from '../data/mockProducts'
 import ProductCard from '../components/ui/ProductCard'
 import ProgressBar from '../components/ui/ProgressBar'
+import SEOHead from '../components/ui/SEOHead'
 
 const questions = [
   {
@@ -86,6 +93,7 @@ export default function SkinQuiz() {
 
   return (
     <main style={{ backgroundColor: 'var(--bg)', minHeight: '80vh' }}>
+      <SEOHead title="Skin Quiz" description="Take Aurea's personalised skin quiz to discover your ideal skincare routine. Get expert product recommendations based on your unique skin profile." />
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '40px 16px 60px' }}>
         {/* Progress */}
         <div style={{ marginBottom: '32px' }}>
