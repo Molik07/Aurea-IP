@@ -21,16 +21,21 @@ const app = express();
 app.use(helmet());
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = NODE_ENV === 'production'
-  ? [FRONTEND_URL]
-  : [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:3000'];
+const allowedOrigins = [
+  FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g., mobile apps, Postman, server-to-server)
       if (!origin) return callback(null, true);
+      // Allow exact matches from the whitelist
       if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow any Vercel preview/production deployment
+      if (/\.vercel\.app$/.test(origin)) return callback(null, true);
       callback(new Error(`CORS: Origin ${origin} not allowed`));
     },
     credentials: true, // Allow cookies (refresh tokens)
